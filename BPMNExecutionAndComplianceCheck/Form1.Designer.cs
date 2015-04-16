@@ -210,7 +210,7 @@
             this.btn_OpenLog.TabIndex = 27;
             this.btn_OpenLog.Text = "Open a trace";
             this.btn_OpenLog.UseVisualStyleBackColor = true;
-            this.btn_OpenLog.Click += new System.EventHandler(this.btn_OpenLog_Click);
+            this.btn_OpenLog.Click += new System.EventHandler(this.btn_OpenTrace_Click);
             // 
             // LogFileTb
             // 
@@ -264,7 +264,7 @@
             this.button1.TabIndex = 31;
             this.button1.Text = "Open a log";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.OpenALog_Click);
             // 
             // btn_save
             // 

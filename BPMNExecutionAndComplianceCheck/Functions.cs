@@ -2618,6 +2618,8 @@ namespace BPMNExecutionAndComplianceCheck
                     pIns.Add(sglNode);
                     ID++;
                 }
+                bool flagComplete = (pIns.FindIndex(x => x.State == "complete") > -1 ? true : false);
+                this.flagOnlyStart = !flagComplete;
                 logFile.Add(pIns);
             }
             return logFile;

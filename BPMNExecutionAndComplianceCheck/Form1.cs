@@ -166,7 +166,7 @@ namespace BPMNExecutionAndComplianceCheck
             this.elementHost1.Child = userControl1;
         }
 
-        private void btn_OpenLog_Click(object sender, EventArgs e)
+        private void btn_OpenTrace_Click(object sender, EventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.FileName = "Document";
@@ -185,10 +185,10 @@ namespace BPMNExecutionAndComplianceCheck
                 string LogFileName = this.LogFileTb.Text;
 
                 this.listAuditEntry = ReadXmlFileForATrace(LogFileName);
-                bool flagStart = (this.listAuditEntry.FindIndex(x=>x.State=="Start")>-1? true : false );
-                bool flagComplete = (this.listAuditEntry.FindIndex(x => x.State == "Complete") > -1 ? true : false);
+                bool flagStart = (this.listAuditEntry.FindIndex(x=>x.State=="start")>-1? true : false );
+                bool flagComplete = (this.listAuditEntry.FindIndex(x => x.State == "complete") > -1 ? true : false);
 
-                this.flagOnlyStart = flagStart & flagComplete;
+                this.flagOnlyStart = !flagComplete;
 
                 string logLabel = "";
                 foreach (AuditTrailEntry entry in this.listAuditEntry)
@@ -444,7 +444,7 @@ namespace BPMNExecutionAndComplianceCheck
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void OpenALog_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to load a log file？", "Reminder", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.Cancel)
             {
