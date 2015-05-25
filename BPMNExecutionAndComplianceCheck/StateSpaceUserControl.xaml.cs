@@ -235,6 +235,7 @@ namespace BPMNExecutionAndComplianceCheck
                 Thickness th = new Thickness();
                 th.Left = (n.POSITION) * SINGLEWIDTH - ItemWid * 0.5;
                 th.Top = (n.Layer + 1) * SINGLEHEIGHT - 0.5 * ItemHeg;
+                //NodeButton nodebutton1 = new NodeButton(n.Layer.ToString(), n.Description, n.HIDE);
                 NodeButton nodebutton1 = new NodeButton(n.ID, n.Description, n.HIDE);
 
                 nodebutton1.Margin = th;

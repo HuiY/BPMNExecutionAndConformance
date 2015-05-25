@@ -235,7 +235,7 @@ namespace BPMNExecutionAndComplianceCheck
             }            
             List<ActionNode> layeredLsModel = this.MaxXYDev(this.StructuredMarkingList, out this.maxLayerDev);
 
-            this.dynamicParameter = (double)(1 / ((double)(this.maxLayerDev - 1))) - 0.01;
+            this.dynamicParameter = (double)(1 / ((double)(2*this.maxLayerDev - 1))) - 0.01;
 
             if (this.FlagOfTrace == true)
             {

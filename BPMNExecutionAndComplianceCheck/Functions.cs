@@ -1655,7 +1655,7 @@ namespace BPMNExecutionAndComplianceCheck
                     case TypeOfElement.Sequence:
                         flag = false;
                         break;
-                    case TypeOfElement.Task:
+                    case TypeOfElement.Task:                   
                         flag = true;
                         break;
                 }
