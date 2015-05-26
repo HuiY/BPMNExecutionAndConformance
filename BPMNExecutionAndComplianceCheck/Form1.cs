@@ -235,7 +235,7 @@ namespace BPMNExecutionAndComplianceCheck
             }            
             List<ActionNode> layeredLsModel = this.MaxXYDev(this.StructuredMarkingList, out this.maxLayerDev);
 
-            this.dynamicParameter = (double)(1 / ((double)(2*this.maxLayerDev - 1))) - 0.01;
+            this.dynamicParameter = (double)(1 / (double)2*((double)(2*this.maxLayerDev - 1)));
 
             if (this.FlagOfTrace == true)
             {
@@ -243,101 +243,26 @@ namespace BPMNExecutionAndComplianceCheck
                 if (RefLogName != null)
                 {
                     newlistAuditEntry = FilteringAuditEntiesForConformanceCheck(this.listAuditEntry, RefLogName);
-                }
-                #region for testing
-                //string rootIndex="";
-                //List<Node> listNode = new List<Node>();
-                //foreach (ActionNode cNode in layeredLsModel)
-                //{
-                //    Node node = new Node();
-                //    node.ID = cNode.ID;
-                //    string des = cNode.Layer.ToString();
-
-                //    //des += cNode.ruleName;
-                //    node.Description = des;
-                //    node.Descendants = cNode.NextMarkingIDlist;
-                //    node.Ancestors = cNode.PreMarkingIDlist;
-                //    if (cNode.PreMarkingIDlist.Count == 0)
-                //    {
-                //        rootIndex = cNode.ID;
-                //        //node.Description = "Start";
-                //    }
-
-                //    listNode.Add(node);
-                //}
-                ////chose to show the tree view of statespace or not
-                //StateSpaceUserControl userControl1 = new StateSpaceUserControl();
-                //userControl1.SetDataResource(listNode, rootIndex);
-                //this.elementHost1.Child = userControl1;
-                #endregion
+                }               
 
                 List<AMatch> listLeaf = new List<AMatch>();
 
                 List<AMatch> MatchesTree = ConstructTheMatchTree(layeredLsModel, newlistAuditEntry, out listLeaf);
 
                 List<List<AMatch>> alignmentTable = GetAllAlignmentResults(MatchesTree, listLeaf);
-                DataTable dtForShow = new DataTable();
-                //since now it only contains one line of alignment, later it may change
-                for (int i = 0; i < alignmentTable[0].Count; i++)
-                {
-                    dtForShow.Columns.Add(i.ToString(), typeof(string));
-                }
-                #region to show
-                foreach (var alignment in alignmentTable)
-                {
-                    DataRow rowLog = dtForShow.NewRow();
-                    DataRow rowModel = dtForShow.NewRow();
-                    int colNum = 0;
-                    for (int i = alignment.Count - 2; i > -1; i--)
-                    {
-                        switch (alignment[i].MatchType)
-                        {
-                            case TypeOfMatch.BothCorrect:
-                                rowLog[colNum] = alignment[i].Entry.Name;
-                                rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
-                                break;
-                            case TypeOfMatch.CTaskFEntry:
-                                rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
-                                rowLog[colNum] = " ┴ ";
-                                break;
-                            case TypeOfMatch.FTaskCEntry:
-                                rowLog[colNum] = alignment[i].Entry.Name;
-                                rowModel[colNum] = " ┴ ";
-                                break;
-                            case TypeOfMatch.BothFake:
-                                if (alignment[i].TaskMarking.ID == alignment[i + 1].TaskMarking.ID)
-                                {
-                                    rowLog[colNum] = alignment[i].Entry.Name;
-                                    rowModel[colNum] = " ┴ ";
-                                }
-                                else if (alignment[i].Entry.ID == alignment[i + 1].Entry.ID)
-                                {
-                                    rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
-                                    rowLog[colNum] = " ┴ ";
-                                }
-                                break;
-                        }
-                        //this.log.Text += "  |  ";
-                        //this.log.Text += rowLog[colNum];
-                        //this.model.Text += "  |  ";
-                        //this.model.Text += rowModel[colNum];
-                        colNum++;
-                    }
-                    dtForShow.Rows.Add(rowLog);
-                    dtForShow.Rows.Add(rowModel);
-                    DataRow emptyR = dtForShow.NewRow();
-                    dtForShow.Rows.Add(emptyR);
-                    this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
-                    this.resultDataTable = dtForShow;
-                    //MessageBox.Show(this.log.Text + "\n" + this.model.Text);
-                #endregion
-                }
+                DataTable dtForShow = PreparingDataForShow(alignmentTable);                
+                
+                this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
+                this.resultDataTable = dtForShow;
+                //MessageBox.Show(this.log.Text + "\n" + this.model.Text);              
+                
             }
             else
             {
                 List<List<AMatch>> resultOfLog = new List<List<AMatch>>();
                 Stopwatch sw = new Stopwatch();
                 long frequency = Stopwatch.Frequency;
+                int numberOfTrace = 1;
                 sw.Start();
                 foreach (var trace in this.listTraces)
                 {
@@ -349,14 +274,19 @@ namespace BPMNExecutionAndComplianceCheck
                         newlistAuditEntry = FilteringAuditEntiesForConformanceCheck(trace, RefLogName);
                     }
                     List<AMatch> matchTree = ConstructTheMatchTree(this.StructuredMarkingList, newlistAuditEntry, out leaf);
-                    List<AMatch> alignmentTable = GetAllAlignmentResults(matchTree, leaf)[0];
-                    resultOfLog.Add(alignmentTable);
+                    List<List<AMatch>> alignmentTable = GetAllAlignmentResults(matchTree, leaf);    
+                    //to indicate the number
+                    foreach(var align in alignmentTable)
+                    {
+                        align[0].TraceID = numberOfTrace.ToString();
+                    }
+                    resultOfLog.AddRange(alignmentTable);
+                    numberOfTrace++;
                 }
-                sw.Stop();
-                //IEnumerable<List<AMatch>> orderedNodeSetList = resultOfLog.OrderByDescending(n => n.Count);
+                sw.Stop();                
                 int max = resultOfLog.Max(x => x.Count);
-                DataTable dtForShow = new DataTable();
-                //since now it only contains one line of alignment, later it may change
+                DataTable dtForShow = new DataTable();     
+                //added trace number
                 for (int i = 0; i < max; i++)
                 {
                     dtForShow.Columns.Add(i.ToString(), typeof(string));
@@ -366,8 +296,10 @@ namespace BPMNExecutionAndComplianceCheck
                 {
                     DataRow rowLog = dtForShow.NewRow();
                     DataRow rowModel = dtForShow.NewRow();
-                    int colNum = 0;
-                    for (int i = alignment.Count - 2; i > -1; i--)
+                    //
+                    rowLog[0] = alignment[0].TraceID;
+                    int colNum = 1;
+                    for (int i = 1; i < alignment.Count; i++)
                     {
                         switch (alignment[i].MatchType)
                         {
@@ -384,35 +316,29 @@ namespace BPMNExecutionAndComplianceCheck
                                 rowModel[colNum] = " ┴ ";
                                 break;
                             case TypeOfMatch.BothFake:
-                                if (alignment[i].TaskMarking.ID == alignment[i + 1].TaskMarking.ID)
+                                if (alignment[i].TaskMarking.ID == alignment[i - 1].TaskMarking.ID)
                                 {
                                     rowLog[colNum] = alignment[i].Entry.Name;
                                     rowModel[colNum] = " ┴ ";
                                 }
-                                else if (alignment[i].Entry.ID == alignment[i + 1].Entry.ID)
+                                else if (alignment[i].Entry.ID == alignment[i - 1].Entry.ID)
                                 {
                                     rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
                                     rowLog[colNum] = " ┴ ";
                                 }
                                 break;
-                        }
+                        }                        
                         colNum++;
-                    }
+                    }                    
                     dtForShow.Rows.Add(rowLog);
                     dtForShow.Rows.Add(rowModel);
                     DataRow emptyR = dtForShow.NewRow();
                     dtForShow.Rows.Add(emptyR);
                 }
-                    this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
-                    this.resultDataTable = dtForShow;
-                #endregion
-                    //MessageBox.Show(this.log.Text + "\n" + this.model.Text);
-                    //this.labelTime.Text = sw.ElapsedMilliseconds.ToString();
-                    //this.labelTimeTicks.Text = sw.ElapsedTicks.ToString();
-                    //long micoSec = (sw.ElapsedTicks * (long)1000 * (long)1000 / frequency);
-                    //this.lbl_micoseconds.Text = micoSec.ToString();
-                    MessageBox.Show("Succeed!");
-                
+                this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
+                this.resultDataTable = dtForShow;
+                #endregion                   
+                MessageBox.Show("Succeed!");                
             }
         }
 

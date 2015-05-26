@@ -31,6 +31,7 @@ namespace BPMNExecutionAndComplianceCheck
         public ActionNode TaskMarking = new ActionNode();
         public AuditTrailEntry Entry=new AuditTrailEntry();
         public int Layer;
+        public string TraceID;
     }
     public enum TypeOfMatch
     {

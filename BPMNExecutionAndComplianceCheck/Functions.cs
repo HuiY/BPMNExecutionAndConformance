@@ -1889,8 +1889,8 @@ namespace BPMNExecutionAndComplianceCheck
         {
             //           
             //int curNodeIndex = originalLsActionNodes.FindIndex(delegate(ActionNode a) { return a.PreMarkingIDlist.Count == 0; });            
-            //ActionNode curNode = originalLsActionNodes[curNodeIndex];
-            //List<List<ActionNode>> NodeSetList = this.FindSubPaths(curNode, originalLsActionNodes);
+            //ActionNode curAMatch = originalLsActionNodes[curNodeIndex];
+            //List<List<ActionNode>> NodeSetList = this.FindSubPaths(curAMatch, originalLsActionNodes);
 
             //foreach (var node in NodeSetList)
             //{
@@ -2496,7 +2496,7 @@ namespace BPMNExecutionAndComplianceCheck
             }
             return listOfChildMarking;
         }
-
+               
         private List<List<AMatch>> GetAllAlignmentResults(List<AMatch> MatchTree, List<AMatch> listLeafMatch)
         {
             List<List<AMatch>> alignmentTable = new List<List<AMatch>>();
@@ -2507,29 +2507,48 @@ namespace BPMNExecutionAndComplianceCheck
 
             for (int j = 0; j < listOfOptiLeaf.Count; j++)
             {
-                List<AMatch> bestAlignment = new List<AMatch>();
+                List<List<AMatch>> bestAlignment = new List<List<AMatch>>();
 
                 AMatch OptiLeaf = listOfOptiLeaf[j];
-
-                while (OptiLeaf.MatchType != TypeOfMatch.NotMatched)
-                {
-                    bestAlignment.Add(OptiLeaf);
-                    int curLayer = OptiLeaf.Layer;
-                    int minLayer=OptiLeaf.PreMatch.Min(x => x.Layer);
-                    if (OptiLeaf.PreMatch.Count > 1)
-                    {                        
-                        OptiLeaf = OptiLeaf.PreMatch.FindAll(x=>x.Layer==minLayer)[0];
-                    }
-                    else
-                    {
-                        OptiLeaf = OptiLeaf.PreMatch[0];
-                    }
-                }
-                alignmentTable.Add(bestAlignment);
+                bestAlignment = this.FindSubFathersForACompletePath(OptiLeaf, MatchTree);
+                alignmentTable.AddRange(bestAlignment);
             }
             return alignmentTable;
-        }
+        }        
+        private List<List<AMatch>> FindSubFathersForACompletePath(AMatch curAMatch, List<AMatch> originallist, List<AMatch> completingPath = null)
+        {            
+            //if curAmatch has prematch as precedures
+            if (curAMatch.PreMatch != null && curAMatch.PreMatch.Count > 0)
+            {
+                List<List<AMatch>> pathsSetForCur = new List<List<AMatch>>();
+                foreach (var preAMatch in curAMatch.PreMatch)
+                {                   
+                    List<List<AMatch>> pathsSetForPre = this.FindSubFathersForACompletePath(preAMatch, originallist, completingPath);
+                    foreach (var completedPath in pathsSetForPre)
+                    {
+                        completedPath.Add(curAMatch);
+                    }
+                    pathsSetForCur.AddRange(pathsSetForPre);
+                }
+                return pathsSetForCur;
+            }
+            else //there are no precedors for curAmatch
+            {
+                if (completingPath == null)
+                {
+                    completingPath = new List<AMatch>();
+                    completingPath.Add(curAMatch);
+                }
+                else
+                {
+                    completingPath.Add(curAMatch);
+                }                
+                List<List<AMatch>> nodeSetList = new List<List<AMatch>>();
+                nodeSetList.Add(completingPath);
 
+                return nodeSetList;
+            }            
+        }
         public void FindStartOfLoop(List<ActionNode> originalList)
         {
             ActionNode start = originalList.FindAll(x=>x.PreMarkingIDlist.Count==0)[0];
@@ -2567,29 +2586,29 @@ namespace BPMNExecutionAndComplianceCheck
         //{
         //    if (startNode.NextMarkingIDlist.Count != 0)
         //    {
-        //        List<List<ActionNode>> outputNodeSetList = new List<List<ActionNode>>();
+        //        List<List<ActionNode>> pathsSetForCur = new List<List<ActionNode>>();
         //        foreach (var ID in startNode.NextMarkingIDlist)
         //        {
         //            ActionNode node = originalList.Find(x => x.ID == ID);
-        //            List<List<ActionNode>> nodeSetList = this.FindSubPaths(node, originalList);
-        //            foreach (var nodeList in nodeSetList)
+        //            List<List<ActionNode>> pathsSetForPre = this.FindSubPaths(node, originalList);
+        //            foreach (var completedPath in pathsSetForPre)
         //            {
-        //                nodeList.Add(node);
+        //                completedPath.Add(node);
         //            }
 
-        //            outputNodeSetList.AddRange(nodeSetList);
+        //            pathsSetForCur.AddRange(pathsSetForPre);
         //        }
 
-        //        return outputNodeSetList;
+        //        return pathsSetForCur;
         //    }
         //    else
         //    {
-        //        List<ActionNode> nodeList = new List<ActionNode>();
-        //        //nodeList.Add(curNode);
-        //        List<List<ActionNode>> nodeSetList = new List<List<ActionNode>>();
-        //        nodeSetList.Add(nodeList);
+        //        List<ActionNode> completedPath = new List<ActionNode>();
+        //        //completedPath.Add(curAMatch);
+        //        List<List<ActionNode>> pathsSetForPre = new List<List<ActionNode>>();
+        //        pathsSetForPre.Add(completedPath);
 
-        //        return nodeSetList;
+        //        return pathsSetForPre;
         //    }
         //}
 
@@ -2691,6 +2710,62 @@ namespace BPMNExecutionAndComplianceCheck
                 return false;
             }
             return true;
+        }
+        public DataTable PreparingDataForShow(List<List<AMatch>> alignmentTable)
+        {
+            DataTable dtForShow = new DataTable();
+            for (int i = 0; i < alignmentTable[0].Count - 1; i++)
+            {
+                dtForShow.Columns.Add(i.ToString(), typeof(string));
+            }
+            #region to show
+            foreach (var alignment in alignmentTable)
+            {
+                DataRow rowLog = dtForShow.NewRow();
+                DataRow rowModel = dtForShow.NewRow();
+                int colNum = 0;
+                for (int i = 1; i < alignment.Count; i++)
+                {
+                    switch (alignment[i].MatchType)
+                    {
+                        case TypeOfMatch.BothCorrect:
+                            rowLog[colNum] = alignment[i].Entry.Name;
+                            rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
+                            break;
+                        case TypeOfMatch.CTaskFEntry:
+                            rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
+                            rowLog[colNum] = " ┴ ";
+                            break;
+                        case TypeOfMatch.FTaskCEntry:
+                            rowLog[colNum] = alignment[i].Entry.Name;
+                            rowModel[colNum] = " ┴ ";
+                            break;
+                        case TypeOfMatch.BothFake:
+                            if (alignment[i].TaskMarking.ID == alignment[i - 1].TaskMarking.ID)
+                            {
+                                rowLog[colNum] = alignment[i].Entry.Name;
+                                rowModel[colNum] = " ┴ ";
+                            }
+                            else if (alignment[i].Entry.ID == alignment[i - 1].Entry.ID)
+                            {
+                                rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
+                                rowLog[colNum] = " ┴ ";
+                            }
+                            break;
+                    }
+                    //this.log.Text += "  |  ";
+                    //this.log.Text += rowLog[colNum];
+                    //this.model.Text += "  |  ";
+                    //this.model.Text += rowModel[colNum];
+                    colNum++;
+                }
+                dtForShow.Rows.Add(rowLog);
+                dtForShow.Rows.Add(rowModel);
+                DataRow emptyR = dtForShow.NewRow();
+                dtForShow.Rows.Add(emptyR);
+            }
+            #endregion
+            return dtForShow;
         }
     }
 }

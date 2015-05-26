@@ -146,25 +146,25 @@ namespace BPMNExecutionAndComplianceCheck
             //    {
             //        string s = testString[k];
             //        int index = listNode.FindIndex(delegate(Node a) { return a.ID == s; });
-            //        Node curNode = listNode[index];
+            //        Node curAMatch = listNode[index];
             //        //若某节点被隐藏了，那么其宽度不变，即不予计算，否则，计算其所有子节点的宽度和
-            //        if (curNode.HIDE)
+            //        if (curAMatch.HIDE)
             //        {
             //            break;
             //        }
-            //        if (curNode.Descendants.Count == 1)
+            //        if (curAMatch.Descendants.Count == 1)
             //        {
-            //            string desString = curNode.Descendants[0];
+            //            string desString = curAMatch.Descendants[0];
             //            Node desNode = listNode.Find(delegate(Node a) { return a.ID == desString; });
 
             //            listNode[index].HeightOfNode += desNode.HeightOfNode;
             //        }
             //        //如果该节点的子节点数大于1，那么重新计算该节点的宽度，即为其子节点的宽度的和
-            //        if (curNode.Descendants.Count > 1)
+            //        if (curAMatch.Descendants.Count > 1)
             //        {
             //            int length = 0;
-            //            int maxHeightOfDes = curNode.HeightOfNode; ;
-            //            foreach (string desString in curNode.Descendants)
+            //            int maxHeightOfDes = curAMatch.HeightOfNode; ;
+            //            foreach (string desString in curAMatch.Descendants)
             //            {
             //                Node desNode = listNode.Find(delegate(Node a) { return a.ID == desString; });
 
