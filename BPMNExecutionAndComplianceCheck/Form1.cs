@@ -16,8 +16,8 @@ namespace BPMNExecutionAndComplianceCheck
         {
             InitializeComponent();
             this.btn_generate.Enabled = false;
-            this.cB_BothStartEnd.Enabled = false;
-            this.cB_Gate2.Enabled = false;
+            //this.cB_BothStartEnd.Enabled = false;
+            //this.cB_Gate2.Enabled = false;
             this.btn_Show.Enabled = false;
         }
 
@@ -149,6 +149,7 @@ namespace BPMNExecutionAndComplianceCheck
                     //    break;
                 }
                 des += cNode.ruleName;
+                //node.Description=cNode.la;
                 node.Description = des;
                 node.Descendants = cNode.NextCauselist;
                 node.Ancestors = cNode.PreCauselist;

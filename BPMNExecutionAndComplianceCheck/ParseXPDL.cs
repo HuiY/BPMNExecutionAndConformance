@@ -277,8 +277,15 @@ namespace BPMNExecutionAndComplianceCheck
                 XmlNode eleXmlRout=((XmlElement)node).GetElementsByTagName("Route","*")[0];
                 List<String> atts = parseAttributes(eleXmlRout, attnames);
                 if (atts.Count != 0) { file.Write(","); }
-		        printAttributes(atts, file);		
-		        file.WriteLine(")");		
+                if (atts[0] == "GatewayType=\"Parallel\"")
+                {
+                    file.Write(atts[0]);
+                }
+                else
+                {
+                    printAttributes(atts, file);	
+                }
+                file.WriteLine(")");			        
 		        return id;
 	        }
 	    public static String parseEmbeddedSub(XmlNode node, System.IO.StreamWriter file){
