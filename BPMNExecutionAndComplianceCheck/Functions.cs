@@ -2115,49 +2115,54 @@ namespace BPMNExecutionAndComplianceCheck
                             }
                         }
                         #endregion
-                        int InxBcCun = curMarkingSet.FindIndex(x => (x.Elment.Name == curEntry.Name) && (x.Elment.State == curEntry.State));
-                        if (InxBcCun > -1)
+                        //int InxBcCun = curMarkingSet.FindIndex(x => (x.Elment.Name == curEntry.Name) && (x.Elment.State == curEntry.State));
+                        List<ActionNode> matchedMarkings = curMarkingSet.FindAll(x => (x.Elment.Name == curEntry.Name) && (x.Elment.State == curEntry.State));
+                        //if (InxBcCun > -1)
+                        if (matchedMarkings.Count>0)
                         {
-                            #region bothcorrect amatch adding
-                            loOfCurEntry = _lsEntry.FindIndex(x => x.ID == curEntry.ID);
-                            heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
-
-                            loOfCurEleInMdl = FindRemainingStepNumInModel(curMarkingSet[InxBcCun], _lsModel);
-                            heurisValueModelPart = loOfCurEleInMdl;
-                            //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
-                            //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
-                            //heurisValue = heurisValueLogPart + heurisValueModelPart;
-
-                            AMatch BcMatch = new AMatch();
-
-                            BcMatch.Deviations = FatherMatch.Deviations;
-                            //BcMatch.Cost = BcMatch.Deviations + heurisValue;
-                            //BcMatch.Cost = FatherMatch.Cost;                
-                            BcMatch.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + BcMatch.Deviations;
-                            BcMatch.Layer = FatherMatch.Layer + 1;
-                            BcMatch.MatchType = TypeOfMatch.BothCorrect;
-                            BcMatch.TaskMarking = curMarkingSet[InxBcCun];
-                            BcMatch.Entry = curEntry;
-                            //Previous version is only combine nodes who generated at the same time, now we changed into a new version where newly added node combined with a node in the existing tree.
-                            //int joinedId = ToJoinList.FindIndex(x => (BcMatch.TaskMarking.Layer == x.TaskMarking.Layer) && (BcMatch.Entry.ID == x.Entry.ID));
-                            int IDinTree = MatchesTree.FindIndex(x => (BcMatch.TaskMarking.ID == x.TaskMarking.ID) && (BcMatch.Entry.ID == x.Entry.ID) && (x.MatchType == TypeOfMatch.BothCorrect) && (x.Deviations == BcMatch.Deviations) && (x.Cost == BcMatch.Cost));
-                            //if (joinedId > -1)
-                            if (IDinTree > -1)
+                            for (int InxBcCun = 0; InxBcCun < matchedMarkings.Count; InxBcCun++)
                             {
-                                //int wholeID = MatchesTree.FindIndex(x => x.ID == ToJoinList[joinedId].ID);
-                                //MatchesTree[wholeID].PreMatch.Add(FatherMatch);
-                                MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
-                            }
-                            else
-                            {
-                                BcMatch.PreMatch.Add(FatherMatch);
-                                MatchID++;
-                                BcMatch.ID = MatchID;
+                                #region bothcorrect amatch adding
+                                loOfCurEntry = _lsEntry.FindIndex(x => x.ID == curEntry.ID);
+                                heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
 
-                                TailMatchSet.Add(BcMatch);
-                                MatchesTree.Add(BcMatch);
+                                loOfCurEleInMdl = FindRemainingStepNumInModel(matchedMarkings[InxBcCun], _lsModel);
+                                heurisValueModelPart = loOfCurEleInMdl;
+                                //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
+                                //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
+                                //heurisValue = heurisValueLogPart + heurisValueModelPart;
+
+                                AMatch BcMatch = new AMatch();
+
+                                BcMatch.Deviations = FatherMatch.Deviations;
+                                //BcMatch.Cost = BcMatch.Deviations + heurisValue;
+                                //BcMatch.Cost = FatherMatch.Cost;                
+                                BcMatch.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + BcMatch.Deviations;
+                                BcMatch.Layer = FatherMatch.Layer + 1;
+                                BcMatch.MatchType = TypeOfMatch.BothCorrect;
+                                BcMatch.TaskMarking = matchedMarkings[InxBcCun];
+                                BcMatch.Entry = curEntry;
+                                //Previous version is only combine nodes who generated at the same time, now we changed into a new version where newly added node combined with a node in the existing tree.
+                                //int joinedId = ToJoinList.FindIndex(x => (BcMatch.TaskMarking.Layer == x.TaskMarking.Layer) && (BcMatch.Entry.ID == x.Entry.ID));
+                                int IDinTree = MatchesTree.FindIndex(x => (BcMatch.TaskMarking.ID == x.TaskMarking.ID) && (BcMatch.Entry.ID == x.Entry.ID) && (x.MatchType == TypeOfMatch.BothCorrect) && (x.Deviations == BcMatch.Deviations) && (x.Cost == BcMatch.Cost));
+                                //if (joinedId > -1)
+                                if (IDinTree > -1)
+                                {
+                                    //int wholeID = MatchesTree.FindIndex(x => x.ID == ToJoinList[joinedId].ID);
+                                    //MatchesTree[wholeID].PreMatch.Add(FatherMatch);
+                                    MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
+                                }
+                                else
+                                {
+                                    BcMatch.PreMatch.Add(FatherMatch);
+                                    MatchID++;
+                                    BcMatch.ID = MatchID;
+
+                                    TailMatchSet.Add(BcMatch);
+                                    MatchesTree.Add(BcMatch);
+                                }
+                                #endregion
                             }
-                            #endregion
                         }
                         else
                         {
@@ -2230,75 +2235,86 @@ namespace BPMNExecutionAndComplianceCheck
                             }
                             #endregion
                         }
-                        for (int i = 0; i < curMarkingSet.Count; i++)
+                        List<ActionNode> remainingSet = new List<ActionNode>();
+                        //remainingSet = (curMarkingSet.Except(matchedMarkings) as List<ActionNode>);
+                        foreach (var action in curMarkingSet)
                         {
-                            if (i != InxBcCun)
+                            if (!matchedMarkings.Contains(action))
                             {
-                                #region correct task fake entry
-                                //if (curMarkingSet[i].Layer > FatherMatch.TaskMarking.Layer || (curMarkingSet[i].Layer == FatherMatch.TaskMarking.Layer && IndeedLoop(curMarkingSet[i], FatherMatch.TaskMarking, this._lsModel)))
-                                //{
-                                //bug if fatherMatch.Entry.ID is null
-                                loOfCurEntry = _lsEntry.FindIndex(x => x.ID == FatherMatch.Entry.ID);
-                                //added Oct. 6th, to have length of model also involved.
-                                heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
-
-                                loOfCurEleInMdl = FindRemainingStepNumInModel(curMarkingSet[i], _lsModel);
-                                heurisValueModelPart = loOfCurEleInMdl;
-                                //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
-                                //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
-                                //heurisValue = heurisValueLogPart + heurisValueModelPart;
-
-                                //MatchID++;
-                                AMatch CTaskFEntry = new AMatch();
-
-                                CTaskFEntry.Deviations = FatherMatch.Deviations + 1;
-                                //CTaskFEntry.Cost = CTaskFEntry.Deviations + heurisValue;
-                                CTaskFEntry.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + CTaskFEntry.Deviations;
-                                //CTaskFEntry.Cost = FatherMatch.Cost + 1 + listEntries.Count - loOfCur;
-                                //CTaskFEntry.Cost = FatherMatch.Cost + 1;
-                                CTaskFEntry.Layer = FatherMatch.Layer + 1;
-                                CTaskFEntry.MatchType = TypeOfMatch.CTaskFEntry;
-                                //CTaskFEntry.PreMatch.Add(FatherMatch);
-                                CTaskFEntry.TaskMarking = curMarkingSet[i];
-                                CTaskFEntry.Entry = FatherMatch.Entry;
-                                //CTaskFEntry.ID = MatchID;
-                                //TailMatchSet.Add(CTaskFEntry);
-                                //LabelMatched = true;
-                                //MatchesTree.Add(CTaskFEntry);
-
-                                int IDinTree = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
-
-                                if (IDinTree > -1)
-                                {
-                                    if (MatchesTree[IDinTree].MatchType == TypeOfMatch.CTaskFEntry || MatchesTree[IDinTree].MatchType == TypeOfMatch.BothFake)
-                                    {
-                                        MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
-                                    }
-                                    else if (MatchesTree[IDinTree].MatchType == TypeOfMatch.FTaskCEntry)
-                                    {
-                                        MatchesTree[IDinTree].MatchType = TypeOfMatch.BothFake;
-                                        MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
-                                        int IDinTail = TailMatchSet.FindIndex(x => x.ID == MatchesTree[IDinTree].ID);
-                                        if (IDinTail > -1)
-                                        {
-                                            TailMatchSet[IDinTail].MatchType = TypeOfMatch.BothFake;
-                                        }
-                                    }
-                                    //Is it a problem that we only update MatchesTree while leaves TailMatchSet behind? No, because we do not make use of PreMatch.                                
-                                }
-                                else
-                                {
-                                    CTaskFEntry.PreMatch.Add(FatherMatch);
-                                    MatchID++;
-                                    CTaskFEntry.ID = MatchID;
-
-                                    TailMatchSet.Add(CTaskFEntry);
-                                    MatchesTree.Add(CTaskFEntry);
-                                }
-                                //}
-                                #endregion
+                                remainingSet.Add(action);
                             }
                         }
+                        
+                        for (int i = 0; i < remainingSet.Count; i++)
+                        {
+                            //if (i != InxBcCun)
+                            //{
+                            #region correct task fake entry
+                            //if (curMarkingSet[i].Layer > FatherMatch.TaskMarking.Layer || (curMarkingSet[i].Layer == FatherMatch.TaskMarking.Layer && IndeedLoop(curMarkingSet[i], FatherMatch.TaskMarking, this._lsModel)))
+                            //{
+                            //bug if fatherMatch.Entry.ID is null
+                            loOfCurEntry = _lsEntry.FindIndex(x => x.ID == FatherMatch.Entry.ID);
+                            //added Oct. 6th, to have length of model also involved.
+                            heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
+
+                            loOfCurEleInMdl = FindRemainingStepNumInModel(curMarkingSet[i], _lsModel);
+                            heurisValueModelPart = loOfCurEleInMdl;
+                            //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
+                            //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
+                            //heurisValue = heurisValueLogPart + heurisValueModelPart;
+
+                            //MatchID++;
+                            AMatch CTaskFEntry = new AMatch();
+
+                            CTaskFEntry.Deviations = FatherMatch.Deviations + 1;
+                            //CTaskFEntry.Cost = CTaskFEntry.Deviations + heurisValue;
+                            CTaskFEntry.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + CTaskFEntry.Deviations;
+                            //CTaskFEntry.Cost = FatherMatch.Cost + 1 + listEntries.Count - loOfCur;
+                            //CTaskFEntry.Cost = FatherMatch.Cost + 1;
+                            CTaskFEntry.Layer = FatherMatch.Layer + 1;
+                            CTaskFEntry.MatchType = TypeOfMatch.CTaskFEntry;
+                            //CTaskFEntry.PreMatch.Add(FatherMatch);
+                            CTaskFEntry.TaskMarking = curMarkingSet[i];
+                            CTaskFEntry.Entry = FatherMatch.Entry;
+                            //CTaskFEntry.ID = MatchID;
+                            //TailMatchSet.Add(CTaskFEntry);
+                            //LabelMatched = true;
+                            //MatchesTree.Add(CTaskFEntry);
+
+                            int IDinTree = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
+
+                            if (IDinTree > -1)
+                            {
+                                if (MatchesTree[IDinTree].MatchType == TypeOfMatch.CTaskFEntry || MatchesTree[IDinTree].MatchType == TypeOfMatch.BothFake)
+                                {
+                                    MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
+                                }
+                                else if (MatchesTree[IDinTree].MatchType == TypeOfMatch.FTaskCEntry)
+                                {
+                                    MatchesTree[IDinTree].MatchType = TypeOfMatch.BothFake;
+                                    MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
+                                    int IDinTail = TailMatchSet.FindIndex(x => x.ID == MatchesTree[IDinTree].ID);
+                                    if (IDinTail > -1)
+                                    {
+                                        TailMatchSet[IDinTail].MatchType = TypeOfMatch.BothFake;
+                                    }
+                                }
+                                //Is it a problem that we only update MatchesTree while leaves TailMatchSet behind? No, because we do not make use of PreMatch.                                
+                            }
+                            else
+                            {
+                                CTaskFEntry.PreMatch.Add(FatherMatch);
+                                MatchID++;
+                                CTaskFEntry.ID = MatchID;
+
+                                TailMatchSet.Add(CTaskFEntry);
+                                MatchesTree.Add(CTaskFEntry);
+                            }
+                            //}
+                            #endregion
+                            //}
+                        }
+                        
                     }
                     #endregion
                     #region end of model
@@ -2501,7 +2517,7 @@ namespace BPMNExecutionAndComplianceCheck
         {
             List<List<AMatch>> alignmentTable = new List<List<AMatch>>();
             IEnumerable<AMatch> orderedLeafOnDeviations = listLeafMatch.OrderByDescending((n => n.Deviations));
-            int lowestDeviation = orderedLeafOnDeviations.ToArray()[0].Deviations;
+            int lowestDeviation = orderedLeafOnDeviations.Reverse().ToArray()[0].Deviations;
 
             List<AMatch> listOfOptiLeaf = listLeafMatch.FindAll(x => x.Deviations == lowestDeviation);
 
