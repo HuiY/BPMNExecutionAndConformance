@@ -237,7 +237,8 @@ namespace BPMNExecutionAndComplianceCheck
 			    file.WriteLine(")");
 			
 			    //If the intermediate event is a boundary event on an activity, store the ID of that activity
-			    if (((XmlElement)intermediateeventnode).GetAttribute("Target") != null){
+                if (((XmlElement)intermediateeventnode).GetAttribute("Target") != null && ((XmlElement)intermediateeventnode).GetAttribute("Target") != "")
+                {
 				    file.Write("new @(\"" + id + "\") -:Target()-> @(\"");
 				    file.WriteLine(normalizeId(((XmlElement)intermediateeventnode).GetAttribute("Target")) + "\")");
 			    }
@@ -278,6 +279,10 @@ namespace BPMNExecutionAndComplianceCheck
                 List<String> atts = parseAttributes(eleXmlRout, attnames);
                 if (atts.Count != 0) { file.Write(","); }
                 if (atts[0] == "GatewayType=\"Parallel\"")
+                {
+                    file.Write(atts[0]);
+                }
+                else if (atts[0] == "GatewayType=\"Inclusive\"")
                 {
                     file.Write(atts[0]);
                 }
