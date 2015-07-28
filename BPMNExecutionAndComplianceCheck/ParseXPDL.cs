@@ -40,16 +40,16 @@ namespace BPMNExecutionAndComplianceCheck
                     //out.println("new graph BPMN \"BPMN test\"");
                     //out.println("include BPMN.layout");
 
-                    //System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\Public\TestFolder\WriteLines2.txt", true);
-                    System.IO.StreamWriter file = new System.IO.StreamWriter(((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grs");
-                    file.WriteLine("new graph BPMN \"BPMN test\"");
+                    fileDirectory = System.Environment.CurrentDirectory+"\\"+((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grs";
+                    //fileDirectory = "C:\\GrGenNET\\HuiTestBPMN\\TestConformanceCheckRuleStep\\grbpmnfiles\\" + ((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grbpmn";
+                    System.IO.StreamWriter file = new System.IO.StreamWriter(fileDirectory);
+                    file.WriteLine("new graph BPMNV7 \"BPMN test\"");
                     //file.WriteLine("include BPMN.layout");                
 
-			        parseProcess((XmlElement) process,file,out flag);
-
-			        //file.close();
+			        parseProcess((XmlElement) process,file,out flag);			        
                     file.Close();
-                    fileDirectory = System.Environment.CurrentDirectory+"\\"+((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grs";
+                    
+                    //fileDirectory = "C:\\GrGenNET\\HuiTestBPMN\\TestConformanceCheckRuleStep\\grbpmnfiles\\"+((XmlElement)process).GetAttribute(ATTRIBUTE_NAME)+".grbpmn";
 		        }                
                     
                 return fileDirectory;
@@ -237,7 +237,9 @@ namespace BPMNExecutionAndComplianceCheck
 			    file.WriteLine(")");
 			
 			    //If the intermediate event is a boundary event on an activity, store the ID of that activity
-			    if (((XmlElement)intermediateeventnode).GetAttribute("Target") != null){
+                if (((XmlElement)intermediateeventnode).GetAttribute("Target") != null && ((XmlElement)intermediateeventnode).GetAttribute("Target") != "")
+			    //if (((XmlElement)intermediateeventnode).GetAttribute("Target") != "")
+                {
 				    file.Write("new @(\"" + id + "\") -:Target()-> @(\"");
 				    file.WriteLine(normalizeId(((XmlElement)intermediateeventnode).GetAttribute("Target")) + "\")");
 			    }
@@ -277,8 +279,19 @@ namespace BPMNExecutionAndComplianceCheck
                 XmlNode eleXmlRout=((XmlElement)node).GetElementsByTagName("Route","*")[0];
                 List<String> atts = parseAttributes(eleXmlRout, attnames);
                 if (atts.Count != 0) { file.Write(","); }
-		        printAttributes(atts, file);		
-		        file.WriteLine(")");		
+                if (atts[0] == "GatewayType=\"Parallel\"")
+                {
+                    file.Write(atts[0]);
+                }
+                else if (atts[0] == "GatewayType=\"Inclusive\"")
+                {
+                    file.Write(atts[0]);
+                }
+                else 
+                {
+                    printAttributes(atts, file);	
+                }
+                file.WriteLine(")");			        
 		        return id;
 	        }
 	    public static String parseEmbeddedSub(XmlNode node, System.IO.StreamWriter file){
@@ -289,20 +302,52 @@ namespace BPMNExecutionAndComplianceCheck
             XmlNode blocknode = ((XmlElement)node).GetElementsByTagName("BlockActivity","*")[0];
 		    String refprocid = normalizeId(((XmlElement)blocknode).GetAttribute("ActivitySetId"));
 		    List<String> containedNodes = new List<string>();
-		    XmlNodeList processChildren = node.ParentNode.ParentNode.ChildNodes;
-		    for (int i = 0; i < processChildren.Count; i++){
-			    if ((processChildren[i].Name != null) && processChildren[i].Name.Equals("ActivitySets")){
-				    XmlNodeList subprocesses = processChildren[i].ChildNodes;
-				    for (int j = 0; j < subprocesses.Count; j++){
-					    if ((subprocesses[j].Name != null) && subprocesses[j].Name.Equals("ActivitySet")){
-						    XmlNode subprocess = subprocesses[j];			
-						    if (getId(subprocess).Equals(refprocid)){
-							    containedNodes.AddRange(parseProcess((XmlElement) subprocess, file,out flag));
-						    }
-					    }
-				    }
-			    }
-		    }
+            XmlNodeList processChildren;
+            //distinguish between one level subprocess and two level suprocess
+            if(node.ParentNode.ParentNode.Name.Equals("xpdl2:ActivitySet"))
+            {
+                processChildren = node.ParentNode.ParentNode.ParentNode.ParentNode.ChildNodes;
+                for (int i = 0; i < processChildren.Count; i++)
+                {
+                    if ((processChildren[i].Name != null) && processChildren[i].Name.Equals("xpdl2:ActivitySets"))
+                    {
+                        XmlNodeList subprocesses = processChildren[i].ChildNodes;
+                        for (int j = 0; j < subprocesses.Count; j++)
+                        {
+                            if ((subprocesses[j].Name != null) && subprocesses[j].Name.Equals("xpdl2:ActivitySet"))
+                            {
+                                XmlNode subprocess = subprocesses[j];
+                                if (getId(subprocess).Equals(refprocid))
+                                {
+                                    containedNodes.AddRange(parseProcess((XmlElement)subprocess, file, out flag));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (node.ParentNode.ParentNode.Name.Equals("xpdl2:WorkflowProcess"))
+            {
+                processChildren = node.ParentNode.ParentNode.ChildNodes;
+                for (int i = 0; i < processChildren.Count; i++)
+                {
+                    if ((processChildren[i].Name != null) && processChildren[i].Name.Equals("xpdl2:ActivitySets"))
+                    {
+                        XmlNodeList subprocesses = processChildren[i].ChildNodes;
+                        for (int j = 0; j < subprocesses.Count; j++)
+                        {
+                            if ((subprocesses[j].Name != null) && subprocesses[j].Name.Equals("xpdl2:ActivitySet"))
+                            {
+                                XmlNode subprocess = subprocesses[j];
+                                if (getId(subprocess).Equals(refprocid))
+                                {
+                                    containedNodes.AddRange(parseProcess((XmlElement)subprocess, file, out flag));
+                                }
+                            }
+                        }
+                    }
+                }
+            } 
 		
 		    //Parse the referencing activity
 		    String[] attnames = {"Name"};

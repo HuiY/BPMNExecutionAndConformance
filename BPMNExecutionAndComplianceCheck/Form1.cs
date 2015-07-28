@@ -16,8 +16,8 @@ namespace BPMNExecutionAndComplianceCheck
         {
             InitializeComponent();
             this.btn_generate.Enabled = false;
-            this.cB_BothStartEnd.Enabled = false;
-            this.cB_Gate2.Enabled = false;
+            //this.cB_BothStartEnd.Enabled = false;
+            //this.cB_Gate2.Enabled = false;
             this.btn_Show.Enabled = false;
         }
 
@@ -66,8 +66,8 @@ namespace BPMNExecutionAndComplianceCheck
 
         private void btn_generate_Click(object sender, EventArgs e)
         {
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             string strFileType = this.FileNameWithType.Substring(this.FileNameWithType.LastIndexOf(".") + 1, (this.FileNameWithType.Length - this.FileNameWithType.LastIndexOf(".") - 1));  
             if(strFileType=="xpdl")
             {
@@ -91,10 +91,11 @@ namespace BPMNExecutionAndComplianceCheck
                 MessageBox.Show("Please import a file with type: .xpdl or .grs!");
                 return;
             }
-            //sw.Stop();
-            //string miSeconds = sw.ElapsedMilliseconds.ToString();
+            sw.Stop();
+            string miSeconds = sw.ElapsedMilliseconds.ToString();
             //this.lab_Time.Text = miSeconds;
-            MessageBox.Show("Running finished!");
+            string tex="Running finished and used "+ miSeconds + "!";
+            MessageBox.Show(tex);
             this.cB_BothStartEnd.Enabled = true;
             this.cB_Gate2.Enabled = true;
             this.btn_Show.Enabled = true;
@@ -149,6 +150,7 @@ namespace BPMNExecutionAndComplianceCheck
                     //    break;
                 }
                 des += cNode.ruleName;
+                //node.Description=cNode.la;
                 node.Description = des;
                 node.Descendants = cNode.NextCauselist;
                 node.Ancestors = cNode.PreCauselist;
@@ -254,7 +256,7 @@ namespace BPMNExecutionAndComplianceCheck
                 
                 this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
                 this.resultDataTable = dtForShow;
-                //MessageBox.Show(this.log.Text + "\n" + this.model.Text);              
+                MessageBox.Show(MatchesTree.Count.ToString());              
                 
             }
             else
@@ -263,6 +265,7 @@ namespace BPMNExecutionAndComplianceCheck
                 Stopwatch sw = new Stopwatch();
                 long frequency = Stopwatch.Frequency;
                 int numberOfTrace = 1;
+                string numberOfNodes="";
                 sw.Start();
                 foreach (var trace in this.listTraces)
                 {
@@ -274,6 +277,7 @@ namespace BPMNExecutionAndComplianceCheck
                         newlistAuditEntry = FilteringAuditEntiesForConformanceCheck(trace, RefLogName);
                     }
                     List<AMatch> matchTree = ConstructTheMatchTree(this.StructuredMarkingList, newlistAuditEntry, out leaf);
+                    numberOfNodes = matchTree.Count.ToString();
                     List<List<AMatch>> alignmentTable = GetAllAlignmentResults(matchTree, leaf);    
                     //to indicate the number
                     foreach(var align in alignmentTable)
@@ -283,7 +287,8 @@ namespace BPMNExecutionAndComplianceCheck
                     resultOfLog.AddRange(alignmentTable);
                     numberOfTrace++;
                 }
-                sw.Stop();                
+                sw.Stop();
+                string miSeconds = sw.ElapsedMilliseconds.ToString();
                 int max = resultOfLog.Max(x => x.Count);
                 DataTable dtForShow = new DataTable();     
                 //added trace number
@@ -338,7 +343,8 @@ namespace BPMNExecutionAndComplianceCheck
                 this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
                 this.resultDataTable = dtForShow;
                 #endregion                   
-                MessageBox.Show("Succeed!");                
+                string show = "Succeed ! And takes " + miSeconds + "ms. And number of nodes is" + numberOfNodes;
+                MessageBox.Show(show);                
             }
         }
 

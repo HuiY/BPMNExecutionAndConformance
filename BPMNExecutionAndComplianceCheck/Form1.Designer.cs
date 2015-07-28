@@ -194,7 +194,7 @@
             // btn_DevCheck
             // 
             this.btn_DevCheck.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_DevCheck.Location = new System.Drawing.Point(868, 24);
+            this.btn_DevCheck.Location = new System.Drawing.Point(1170, 22);
             this.btn_DevCheck.Name = "btn_DevCheck";
             this.btn_DevCheck.Size = new System.Drawing.Size(94, 53);
             this.btn_DevCheck.TabIndex = 28;
@@ -204,7 +204,7 @@
             // 
             // btn_OpenLog
             // 
-            this.btn_OpenLog.Location = new System.Drawing.Point(597, 18);
+            this.btn_OpenLog.Location = new System.Drawing.Point(899, 16);
             this.btn_OpenLog.Name = "btn_OpenLog";
             this.btn_OpenLog.Size = new System.Drawing.Size(85, 23);
             this.btn_OpenLog.TabIndex = 27;
@@ -214,7 +214,7 @@
             // 
             // LogFileTb
             // 
-            this.LogFileTb.Location = new System.Drawing.Point(413, 42);
+            this.LogFileTb.Location = new System.Drawing.Point(715, 40);
             this.LogFileTb.Name = "LogFileTb";
             this.LogFileTb.Size = new System.Drawing.Size(356, 20);
             this.LogFileTb.TabIndex = 26;
@@ -222,7 +222,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(410, 26);
+            this.label2.Location = new System.Drawing.Point(712, 24);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(181, 13);
             this.label2.TabIndex = 25;
@@ -232,7 +232,7 @@
             // 
             this.elementHost1.Location = new System.Drawing.Point(9, 163);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(380, 550);
+            this.elementHost1.Size = new System.Drawing.Size(680, 550);
             this.elementHost1.TabIndex = 22;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
@@ -240,7 +240,7 @@
             // DataViewForAlignment
             // 
             this.DataViewForAlignment.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DataViewForAlignment.Location = new System.Drawing.Point(411, 83);
+            this.DataViewForAlignment.Location = new System.Drawing.Point(713, 81);
             this.DataViewForAlignment.Name = "DataViewForAlignment";
             this.DataViewForAlignment.Size = new System.Drawing.Size(585, 531);
             this.DataViewForAlignment.TabIndex = 29;
@@ -258,7 +258,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(694, 18);
+            this.button1.Location = new System.Drawing.Point(996, 16);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 31;
@@ -268,7 +268,7 @@
             // 
             // btn_save
             // 
-            this.btn_save.Location = new System.Drawing.Point(887, 635);
+            this.btn_save.Location = new System.Drawing.Point(1189, 633);
             this.btn_save.Name = "btn_save";
             this.btn_save.Size = new System.Drawing.Size(75, 23);
             this.btn_save.TabIndex = 32;
@@ -281,7 +281,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1008, 730);
+            this.ClientSize = new System.Drawing.Size(1308, 730);
             this.Controls.Add(this.btn_save);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_DevCheck);

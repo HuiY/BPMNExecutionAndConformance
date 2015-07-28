@@ -25,7 +25,7 @@ namespace BPMNExecutionAndComplianceCheck
         }
 
         const double HInter = 20;
-        const double VInter = 20;
+        const double VInter = 60;
         const double ItemWid = 80;
         const double ItemHeg = 40;
         double SINGLEWIDTH = ItemWid + HInter;
@@ -250,12 +250,28 @@ namespace BPMNExecutionAndComplianceCheck
                     parToChi.X2 = ch.POSITION * SINGLEWIDTH;
                     parToChi.Y2 = (ch.Layer + 1) * SINGLEHEIGHT - 0.5 * ItemHeg;
 
+                    parToChi.MouseDown += new MouseButtonEventHandler(line_MouseDown);
+                    parToChi.MouseUp += new MouseButtonEventHandler(line_MouseUp);
+
+
                     SolidColorBrush br = new SolidColorBrush(Colors.Black);
                     parToChi.Stroke = br;
                     this.ShowCan.Children.Add(parToChi);
                 }
 
             }
+        }
+
+        void line_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // Change line colour back to normal 
+            ((Line)sender).Stroke = Brushes.Black;
+        }
+
+        void line_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Change line Colour to something
+            ((Line)sender).Stroke = Brushes.Red;
         }
     }
 }

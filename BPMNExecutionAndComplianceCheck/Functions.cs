@@ -81,6 +81,12 @@ namespace BPMNExecutionAndComplianceCheck
                 IMatchesExact<Rule_leaveAutonomousBoundaryEvent.IMatch_leaveAutonomousBoundaryEvent> matleaveAutonomousBoundaryEvent = actions.leaveAutonomousBoundaryEvent.Match(graph, 10, curMarking);
                 IMatchesExact<Rule_enterIntermediateNoneOrTimerEvent.IMatch_enterIntermediateNoneOrTimerEvent> matenterIntermediateNoneOrTimerEvent = actions.enterIntermediateNoneOrTimerEvent.Match(graph, 10, curMarking);
                 IMatchesExact<Rule_leaveIntermediateNoneOrTimerEvent.IMatch_leaveIntermediateNoneOrTimerEvent> matleaveIntermediateNoneOrTimerEvent = actions.leaveIntermediateNoneOrTimerEvent.Match(graph, 10, curMarking);
+                //added four 5 new rules
+                IMatchesExact<Rule_enterInclusiveGateway.IMatch_enterInclusiveGateway> matenterInclusiveGateway = actions.enterInclusiveGateway.Match(graph,10,curMarking);
+                IMatchesExact<Rule_leaveInclusiveGatewayJoin.IMatch_leaveInclusiveGatewayJoin> matleaveInclusiveJoin = actions.leaveInclusiveGatewayJoin.Match(graph,10,curMarking);
+                IMatchesExact<Rule_leaveInclusiveGatewaySplitTwo.IMatch_leaveInclusiveGatewaySplitTwo> matleaveIncluSplitTwo=actions.leaveInclusiveGatewaySplitTwo.Match(graph,10,curMarking);
+                IMatchesExact<Rule_leaveInclusiveGatewaySplitThree.IMatch_leaveInclusiveGatewaySplitThree> matleaveIncluSplitThree = actions.leaveInclusiveGatewaySplitThree.Match(graph, 10, curMarking);
+                IMatchesExact<Rule_enterMessageCatchIntermediateEventFake.IMatch_enterMessageCatchIntermediateEventFake> matenterMessageInterFake = actions.enterMessageCatchIntermediateEventFake.Match(graph, 10, curMarking);
                 #endregion
 
                 #region enterStart
@@ -269,7 +275,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, task, "leaveTaskOneOut");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "enterAutonomousBoundaryEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "enterAutonomousBoundaryEvent");
 
                                 //}
                             }
@@ -305,7 +311,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "enterEndEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "enterEndEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "enterEndEvent");
 
                                 //}
                             }
@@ -395,11 +401,11 @@ namespace BPMNExecutionAndComplianceCheck
                     foreach (var match in matenterSubprocess)
                     {
                         actions.enterSubprocess.Modify(graph, match as Rule_enterSubprocess.IMatch_enterSubprocess, out mNewMarking, out curMarking1, out blockActivity);
-                        bool flagCM1M2IfNew = actions.ConnectM1toM2IfNew.Apply(graph, curMarking1, mNewMarking, blockActivity, "enterSubprocess");
+                        bool flagCM1M2IfNew = actions.ConnectM1toM2IfNewForSub.Apply(graph, curMarking1, mNewMarking, blockActivity, "enterSubprocess");
                         if (!flagCM1M2IfNew)
                         {
                             IMarking m3 = null;
-                            bool flagEguivalent = actions.GetEquivalentOfM2.Apply(graph, curMarking1, mNewMarking, ref m3);
+                            bool flagEguivalent = actions.GetEquivalentOfM2ForSub.Apply(graph, curMarking1, mNewMarking, ref m3);
                             actions.DelM.Apply(graph, mNewMarking);
                             if (m3 != null)
                             {
@@ -441,7 +447,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, flowEleCont, "terminateProcessNormal");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "enterAutonomousBoundaryEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "enterAutonomousBoundaryEvent");
 
                                 //}
                             }
@@ -479,7 +485,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "enterAutonomousBoundaryEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "enterAutonomousBoundaryEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "enterAutonomousBoundaryEvent");
 
                                 //}
                             }
@@ -583,7 +589,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "enterThrowErrorEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "enterThrowErrorEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "enterThrowErrorEvent");
 
                                 //}
                             }
@@ -617,7 +623,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "leaveThrowErrorEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "leaveThrowErrorEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveThrowErrorEvent");
 
                                 //}
                             }
@@ -650,7 +656,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "leaveSignalOrMessageOrCancelCatchIntermediateEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "leaveSignalOrMessageOrCancelCatchIntermediateEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveSignalOrMessageOrCancelCatchIntermediateEvent");
 
                                 //}
                             }
@@ -682,7 +688,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "traverseIntermediateErrorEvent_boundaryCatchImplicitExceptions");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "traverseIntermediateErrorEvent_boundaryCatchImplicitExceptions");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "traverseIntermediateErrorEvent_boundaryCatchImplicitExceptions");
 
                                 //}
                             }
@@ -715,7 +721,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "leaveAutonomousBoundaryEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "leaveAutonomousBoundaryEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveAutonomousBoundaryEvent");
 
                                 //}
                             }
@@ -748,7 +754,7 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "enterIntermediateNoneOrTimerEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "enterIntermediateNoneOrTimerEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "enterIntermediateNoneOrTimerEvent");
 
                                 //}
                             }
@@ -781,7 +787,157 @@ namespace BPMNExecutionAndComplianceCheck
                                 bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, endevent, "leaveIntermediateNoneOrTimerEvent");
                                 //if (!flagConnectNotYet)
                                 //{
-                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, endevent, "leaveIntermediateNoneOrTimerEvent");
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveIntermediateNoneOrTimerEvent");
+
+                                //}
+                            }
+                            //graph.RemoveEdges(mNewMarking);
+                            //graph.Remove(mNewMarking);
+                        }
+                        else
+                        {
+                            unFinishedMarking.Add(mNewMarking as Marking);
+                            numOfCause++;
+                        }
+                    }
+                }
+                #endregion
+                #region enterInclusiveGateway
+                if (matenterInclusiveGateway.Count != 0)
+                {
+                    IGateway IncluGateway;
+                    foreach (var match in matenterInclusiveGateway)
+                    {
+                        actions.enterInclusiveGateway.Modify(graph, match as Rule_enterInclusiveGateway.IMatch_enterInclusiveGateway, out mNewMarking, out curMarking1, out IncluGateway);
+                        bool flagCM1M2IfNew = actions.ConnectM1toM2IfNew.Apply(graph, curMarking1, mNewMarking, IncluGateway, "enterInclusiveGateway");
+                        if (!flagCM1M2IfNew)
+                        {
+                            IMarking m3 = null;
+                            bool flagEguivalent = actions.GetEquivalentOfM2.Apply(graph, curMarking1, mNewMarking, ref m3);
+                            actions.DelM.Apply(graph, mNewMarking);
+                            if (m3 != null)
+                            {
+                                bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, IncluGateway, "enterInclusiveGateway");
+                                //if (!flagConnectNotYet)
+                                //{
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveIntermediateNoneOrTimerEvent");
+
+                                //}
+                            }
+                            //graph.RemoveEdges(mNewMarking);
+                            //graph.Remove(mNewMarking);
+                        }
+                        else
+                        {
+                            unFinishedMarking.Add(mNewMarking as Marking);
+                            numOfCause++;
+                        }
+                    }
+                }
+                #endregion
+                #region leaveInclusiveGatewayJoin
+                if (matleaveInclusiveJoin.Count != 0)
+                {
+                    IGateway IncluGateway;
+                    foreach (var match in matleaveInclusiveJoin)
+                    {
+                        actions.leaveInclusiveGatewayJoin.Modify(graph, match as Rule_leaveInclusiveGatewayJoin.IMatch_leaveInclusiveGatewayJoin, out mNewMarking, out curMarking1, out IncluGateway);
+                        bool flagCM1M2IfNew = actions.ConnectM1toM2IfNew.Apply(graph, curMarking1, mNewMarking, IncluGateway, "leaveInclusiveGatewayJoin");
+                        if (!flagCM1M2IfNew)
+                        {
+                            IMarking m3 = null;
+                            bool flagEguivalent = actions.GetEquivalentOfM2.Apply(graph, curMarking1, mNewMarking, ref m3);
+                            actions.DelM.Apply(graph, mNewMarking);
+                            if (m3 != null)
+                            {
+                                bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, IncluGateway, "leaveInclusiveGatewayJoin");
+                                //if (!flagConnectNotYet)
+                                //{
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveIntermediateNoneOrTimerEvent");
+
+                                //}
+                            }
+                            //graph.RemoveEdges(mNewMarking);
+                            //graph.Remove(mNewMarking);
+                        }
+                        else
+                        {
+                            unFinishedMarking.Add(mNewMarking as Marking);
+                            numOfCause++;
+                        }
+                    }
+                }
+                #endregion
+                #region leaveInclusiveGatewaySplitTwo
+                if (matleaveIncluSplitTwo.Count != 0)
+                {
+                    IGateway IncluGateway;
+                    foreach (var match in matleaveIncluSplitTwo)
+                    {
+                        IMarking mNew1 = new Marking();
+                        IMarking mNew2 = new Marking();
+                        actions.leaveInclusiveGatewaySplitTwo.Modify(graph, match as Rule_leaveInclusiveGatewaySplitTwo.IMatch_leaveInclusiveGatewaySplitTwo, out mNewMarking, out mNew1, out mNew2, out curMarking1, out IncluGateway);
+                        unFinishedMarking.Add(mNewMarking as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew1 as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew2 as Marking);
+                        numOfCause++;
+                        break;
+                    }
+                }
+                #endregion
+                #region leaveInclusiveGatewaySplitThree
+                if (matleaveIncluSplitThree.Count != 0)
+                {
+                    IGateway IncluGateway;
+                    foreach (var match in matleaveIncluSplitThree)
+                    {
+                        IMarking mNew1 = new Marking();
+                        IMarking mNew2 = new Marking();
+                        IMarking mNew3 = new Marking();
+                        IMarking mNew4 = new Marking();
+                        IMarking mNew5 = new Marking();
+                        IMarking mNew6 = new Marking();
+                        actions.leaveInclusiveGatewaySplitThree.Modify(graph, match as Rule_leaveInclusiveGatewaySplitThree.IMatch_leaveInclusiveGatewaySplitThree, out mNewMarking,out mNew1,out mNew2,out mNew3,out mNew4,out mNew5,out mNew6, out curMarking1, out IncluGateway);
+                        unFinishedMarking.Add(mNewMarking as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew1 as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew2 as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew3 as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew4 as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew5 as Marking);
+                        numOfCause++;
+                        unFinishedMarking.Add(mNew6 as Marking);
+                        numOfCause++;
+                        break;
+                       
+                    }
+                }
+                #endregion
+                #region enterMessageCatchIntermediateEventFake
+                if (matenterMessageInterFake.Count != 0)
+                {
+                    IIntermediateCatchEvent interCatchEvent;
+                    foreach (var match in matenterMessageInterFake)
+                    {
+                        actions.enterMessageCatchIntermediateEventFake.Modify(graph, match as Rule_enterMessageCatchIntermediateEventFake.IMatch_enterMessageCatchIntermediateEventFake, out mNewMarking, out curMarking1, out interCatchEvent);
+                        bool flagCM1M2IfNew = actions.ConnectM1toM2IfNew.Apply(graph, curMarking1, mNewMarking, interCatchEvent, "enterMessageCatchIntermediateEventFake");
+                        if (!flagCM1M2IfNew)
+                        {
+                            IMarking m3 = null;
+                            bool flagEguivalent = actions.GetEquivalentOfM2.Apply(graph, curMarking1, mNewMarking, ref m3);
+                            actions.DelM.Apply(graph, mNewMarking);
+                            if (m3 != null)
+                            {
+                                bool flagConnectNotYet = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, m3, interCatchEvent, "enterMessageCatchIntermediateEventFake");
+                                //if (!flagConnectNotYet)
+                                //{
+                                //    bool flagConn2 = actions.ConnectIfNotYetConnected.Apply(graph, curMarking1, curMarking1, IncluGateway, "leaveIntermediateNoneOrTimerEvent");
 
                                 //}
                             }
@@ -2039,7 +2195,7 @@ namespace BPMNExecutionAndComplianceCheck
 
                 for (int i = 0; i < TailMatchSet.Count; i++)
                 {
-                    labelStop = false;
+                    //labelStop = false;
                     AMatch OneMatch = TailMatchSet[i];
                     if (OneMatch.Cost == GlobalLowestDevs)
                     {
@@ -2115,49 +2271,54 @@ namespace BPMNExecutionAndComplianceCheck
                             }
                         }
                         #endregion
-                        int InxBcCun = curMarkingSet.FindIndex(x => (x.Elment.Name == curEntry.Name) && (x.Elment.State == curEntry.State));
-                        if (InxBcCun > -1)
+                        //int InxBcCun = curMarkingSet.FindIndex(x => (x.Elment.Name == curEntry.Name) && (x.Elment.State == curEntry.State));
+                        List<ActionNode> matchedMarkings = curMarkingSet.FindAll(x => (x.Elment.Name == curEntry.Name) && (x.Elment.State == curEntry.State));
+                        //if (InxBcCun > -1)
+                        if (matchedMarkings.Count>0)
                         {
-                            #region bothcorrect amatch adding
-                            loOfCurEntry = _lsEntry.FindIndex(x => x.ID == curEntry.ID);
-                            heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
-
-                            loOfCurEleInMdl = FindRemainingStepNumInModel(curMarkingSet[InxBcCun], _lsModel);
-                            heurisValueModelPart = loOfCurEleInMdl;
-                            //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
-                            //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
-                            //heurisValue = heurisValueLogPart + heurisValueModelPart;
-
-                            AMatch BcMatch = new AMatch();
-
-                            BcMatch.Deviations = FatherMatch.Deviations;
-                            //BcMatch.Cost = BcMatch.Deviations + heurisValue;
-                            //BcMatch.Cost = FatherMatch.Cost;                
-                            BcMatch.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + BcMatch.Deviations;
-                            BcMatch.Layer = FatherMatch.Layer + 1;
-                            BcMatch.MatchType = TypeOfMatch.BothCorrect;
-                            BcMatch.TaskMarking = curMarkingSet[InxBcCun];
-                            BcMatch.Entry = curEntry;
-                            //Previous version is only combine nodes who generated at the same time, now we changed into a new version where newly added node combined with a node in the existing tree.
-                            //int joinedId = ToJoinList.FindIndex(x => (BcMatch.TaskMarking.Layer == x.TaskMarking.Layer) && (BcMatch.Entry.ID == x.Entry.ID));
-                            int IDinTree = MatchesTree.FindIndex(x => (BcMatch.TaskMarking.ID == x.TaskMarking.ID) && (BcMatch.Entry.ID == x.Entry.ID) && (x.MatchType == TypeOfMatch.BothCorrect) && (x.Deviations == BcMatch.Deviations) && (x.Cost == BcMatch.Cost));
-                            //if (joinedId > -1)
-                            if (IDinTree > -1)
+                            for (int InxBcCun = 0; InxBcCun < matchedMarkings.Count; InxBcCun++)
                             {
-                                //int wholeID = MatchesTree.FindIndex(x => x.ID == ToJoinList[joinedId].ID);
-                                //MatchesTree[wholeID].PreMatch.Add(FatherMatch);
-                                MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
-                            }
-                            else
-                            {
-                                BcMatch.PreMatch.Add(FatherMatch);
-                                MatchID++;
-                                BcMatch.ID = MatchID;
+                                #region bothcorrect amatch adding
+                                loOfCurEntry = _lsEntry.FindIndex(x => x.ID == curEntry.ID);
+                                heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
 
-                                TailMatchSet.Add(BcMatch);
-                                MatchesTree.Add(BcMatch);
+                                loOfCurEleInMdl = FindRemainingStepNumInModel(matchedMarkings[InxBcCun], _lsModel);
+                                heurisValueModelPart = loOfCurEleInMdl;
+                                //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
+                                //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
+                                //heurisValue = heurisValueLogPart + heurisValueModelPart;
+
+                                AMatch BcMatch = new AMatch();
+
+                                BcMatch.Deviations = FatherMatch.Deviations;
+                                //BcMatch.Cost = BcMatch.Deviations + heurisValue;
+                                //BcMatch.Cost = FatherMatch.Cost;                
+                                BcMatch.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + BcMatch.Deviations;
+                                BcMatch.Layer = FatherMatch.Layer + 1;
+                                BcMatch.MatchType = TypeOfMatch.BothCorrect;
+                                BcMatch.TaskMarking = matchedMarkings[InxBcCun];
+                                BcMatch.Entry = curEntry;
+                                //Previous version is only combine nodes who generated at the same time, now we changed into a new version where newly added node combined with a node in the existing tree.
+                                //int joinedId = ToJoinList.FindIndex(x => (BcMatch.TaskMarking.Layer == x.TaskMarking.Layer) && (BcMatch.Entry.ID == x.Entry.ID));
+                                int IDinTree = MatchesTree.FindIndex(x => (BcMatch.TaskMarking.ID == x.TaskMarking.ID) && (BcMatch.Entry.ID == x.Entry.ID) && (x.MatchType == TypeOfMatch.BothCorrect) && (x.Deviations == BcMatch.Deviations) && (x.Cost == BcMatch.Cost));
+                                //if (joinedId > -1)
+                                if (IDinTree > -1)
+                                {
+                                    //int wholeID = MatchesTree.FindIndex(x => x.ID == ToJoinList[joinedId].ID);
+                                    //MatchesTree[wholeID].PreMatch.Add(FatherMatch);
+                                    MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
+                                }
+                                else
+                                {
+                                    BcMatch.PreMatch.Add(FatherMatch);
+                                    MatchID++;
+                                    BcMatch.ID = MatchID;
+
+                                    TailMatchSet.Add(BcMatch);
+                                    MatchesTree.Add(BcMatch);
+                                }
+                                #endregion
                             }
-                            #endregion
                         }
                         else
                         {
@@ -2230,75 +2391,86 @@ namespace BPMNExecutionAndComplianceCheck
                             }
                             #endregion
                         }
-                        for (int i = 0; i < curMarkingSet.Count; i++)
+                        List<ActionNode> remainingSet = new List<ActionNode>();
+                        //remainingSet = (curMarkingSet.Except(matchedMarkings) as List<ActionNode>);
+                        foreach (var action in curMarkingSet)
                         {
-                            if (i != InxBcCun)
+                            if (!matchedMarkings.Contains(action))
                             {
-                                #region correct task fake entry
-                                //if (curMarkingSet[i].Layer > FatherMatch.TaskMarking.Layer || (curMarkingSet[i].Layer == FatherMatch.TaskMarking.Layer && IndeedLoop(curMarkingSet[i], FatherMatch.TaskMarking, this._lsModel)))
-                                //{
-                                //bug if fatherMatch.Entry.ID is null
-                                loOfCurEntry = _lsEntry.FindIndex(x => x.ID == FatherMatch.Entry.ID);
-                                //added Oct. 6th, to have length of model also involved.
-                                heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
-
-                                loOfCurEleInMdl = FindRemainingStepNumInModel(curMarkingSet[i], _lsModel);
-                                heurisValueModelPart = loOfCurEleInMdl;
-                                //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
-                                //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
-                                //heurisValue = heurisValueLogPart + heurisValueModelPart;
-
-                                //MatchID++;
-                                AMatch CTaskFEntry = new AMatch();
-
-                                CTaskFEntry.Deviations = FatherMatch.Deviations + 1;
-                                //CTaskFEntry.Cost = CTaskFEntry.Deviations + heurisValue;
-                                CTaskFEntry.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + CTaskFEntry.Deviations;
-                                //CTaskFEntry.Cost = FatherMatch.Cost + 1 + listEntries.Count - loOfCur;
-                                //CTaskFEntry.Cost = FatherMatch.Cost + 1;
-                                CTaskFEntry.Layer = FatherMatch.Layer + 1;
-                                CTaskFEntry.MatchType = TypeOfMatch.CTaskFEntry;
-                                //CTaskFEntry.PreMatch.Add(FatherMatch);
-                                CTaskFEntry.TaskMarking = curMarkingSet[i];
-                                CTaskFEntry.Entry = FatherMatch.Entry;
-                                //CTaskFEntry.ID = MatchID;
-                                //TailMatchSet.Add(CTaskFEntry);
-                                //LabelMatched = true;
-                                //MatchesTree.Add(CTaskFEntry);
-
-                                int IDinTree = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
-
-                                if (IDinTree > -1)
-                                {
-                                    if (MatchesTree[IDinTree].MatchType == TypeOfMatch.CTaskFEntry || MatchesTree[IDinTree].MatchType == TypeOfMatch.BothFake)
-                                    {
-                                        MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
-                                    }
-                                    else if (MatchesTree[IDinTree].MatchType == TypeOfMatch.FTaskCEntry)
-                                    {
-                                        MatchesTree[IDinTree].MatchType = TypeOfMatch.BothFake;
-                                        MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
-                                        int IDinTail = TailMatchSet.FindIndex(x => x.ID == MatchesTree[IDinTree].ID);
-                                        if (IDinTail > -1)
-                                        {
-                                            TailMatchSet[IDinTail].MatchType = TypeOfMatch.BothFake;
-                                        }
-                                    }
-                                    //Is it a problem that we only update MatchesTree while leaves TailMatchSet behind? No, because we do not make use of PreMatch.                                
-                                }
-                                else
-                                {
-                                    CTaskFEntry.PreMatch.Add(FatherMatch);
-                                    MatchID++;
-                                    CTaskFEntry.ID = MatchID;
-
-                                    TailMatchSet.Add(CTaskFEntry);
-                                    MatchesTree.Add(CTaskFEntry);
-                                }
-                                //}
-                                #endregion
+                                remainingSet.Add(action);
                             }
                         }
+                        
+                        for (int i = 0; i < remainingSet.Count; i++)
+                        {
+                            //if (i != InxBcCun)
+                            //{
+                            #region correct task fake entry
+                            //if (curMarkingSet[i].Layer > FatherMatch.TaskMarking.Layer || (curMarkingSet[i].Layer == FatherMatch.TaskMarking.Layer && IndeedLoop(curMarkingSet[i], FatherMatch.TaskMarking, this._lsModel)))
+                            //{
+                            //bug if fatherMatch.Entry.ID is null
+                            loOfCurEntry = _lsEntry.FindIndex(x => x.ID == FatherMatch.Entry.ID);
+                            //added Oct. 6th, to have length of model also involved.
+                            heurisValueLogPart = _lsEntry.Count - loOfCurEntry;
+
+                            loOfCurEleInMdl = FindRemainingStepNumInModel(curMarkingSet[i], _lsModel);
+                            heurisValueModelPart = loOfCurEleInMdl;
+                            //heurisValue = (heurisValueLogPart + heurisValueModelPart) / 2;
+                            //heurisValue = Math.Max(heurisValueLogPart, heurisValueModelPart);
+                            //heurisValue = heurisValueLogPart + heurisValueModelPart;
+
+                            //MatchID++;
+                            AMatch CTaskFEntry = new AMatch();
+
+                            CTaskFEntry.Deviations = FatherMatch.Deviations + 1;
+                            //CTaskFEntry.Cost = CTaskFEntry.Deviations + heurisValue;
+                            CTaskFEntry.Cost = HeurisValue(heurisValueLogPart, heurisValueModelPart) + CTaskFEntry.Deviations;
+                            //CTaskFEntry.Cost = FatherMatch.Cost + 1 + listEntries.Count - loOfCur;
+                            //CTaskFEntry.Cost = FatherMatch.Cost + 1;
+                            CTaskFEntry.Layer = FatherMatch.Layer + 1;
+                            CTaskFEntry.MatchType = TypeOfMatch.CTaskFEntry;
+                            //CTaskFEntry.PreMatch.Add(FatherMatch);
+                            CTaskFEntry.TaskMarking = curMarkingSet[i];
+                            CTaskFEntry.Entry = FatherMatch.Entry;
+                            //CTaskFEntry.ID = MatchID;
+                            //TailMatchSet.Add(CTaskFEntry);
+                            //LabelMatched = true;
+                            //MatchesTree.Add(CTaskFEntry);
+
+                            int IDinTree = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
+
+                            if (IDinTree > -1)
+                            {
+                                if (MatchesTree[IDinTree].MatchType == TypeOfMatch.CTaskFEntry || MatchesTree[IDinTree].MatchType == TypeOfMatch.BothFake)
+                                {
+                                    MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
+                                }
+                                else if (MatchesTree[IDinTree].MatchType == TypeOfMatch.FTaskCEntry)
+                                {
+                                    MatchesTree[IDinTree].MatchType = TypeOfMatch.BothFake;
+                                    MatchesTree[IDinTree].PreMatch.Add(FatherMatch);
+                                    int IDinTail = TailMatchSet.FindIndex(x => x.ID == MatchesTree[IDinTree].ID);
+                                    if (IDinTail > -1)
+                                    {
+                                        TailMatchSet[IDinTail].MatchType = TypeOfMatch.BothFake;
+                                    }
+                                }
+                                //Is it a problem that we only update MatchesTree while leaves TailMatchSet behind? No, because we do not make use of PreMatch.                                
+                            }
+                            else
+                            {
+                                CTaskFEntry.PreMatch.Add(FatherMatch);
+                                MatchID++;
+                                CTaskFEntry.ID = MatchID;
+
+                                TailMatchSet.Add(CTaskFEntry);
+                                MatchesTree.Add(CTaskFEntry);
+                            }
+                            //}
+                            #endregion
+                            //}
+                        }
+                        
                     }
                     #endregion
                     #region end of model
@@ -2501,7 +2673,7 @@ namespace BPMNExecutionAndComplianceCheck
         {
             List<List<AMatch>> alignmentTable = new List<List<AMatch>>();
             IEnumerable<AMatch> orderedLeafOnDeviations = listLeafMatch.OrderByDescending((n => n.Deviations));
-            int lowestDeviation = orderedLeafOnDeviations.ToArray()[0].Deviations;
+            int lowestDeviation = orderedLeafOnDeviations.Reverse().ToArray()[0].Deviations;
 
             List<AMatch> listOfOptiLeaf = listLeafMatch.FindAll(x => x.Deviations == lowestDeviation);
 

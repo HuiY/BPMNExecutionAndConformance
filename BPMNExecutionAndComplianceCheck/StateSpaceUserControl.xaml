@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-              d:DesignHeight="550" d:DesignWidth="380">
-    <Grid  Height="550" Width="380">
+              d:DesignHeight="550" d:DesignWidth="680">
+    <Grid  Height="550" Width="680">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="Auto"/>
@@ -15,8 +15,8 @@
                     Minimum="0.2" Maximum="3" Value="1"/>
         </Grid>
         <ScrollViewer CanContentScroll="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="1"
-                          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="0,0" ClipToBounds="True" Height="520" Width="380">
-            <Canvas Name="ShowCan" Background="lightBlue" Height="570" Width="500">
+                          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Margin="0,0" ClipToBounds="True" Height="520" Width="680">
+            <Canvas Name="ShowCan" Background="lightBlue" Height="570" Width="680">
                 <Canvas.LayoutTransform>
                     <TransformGroup>
                         <ScaleTransform ScaleX="{Binding ElementName=slider1, Path=Value}" ScaleY="{Binding ElementName=slider1, Path=Value}"/>
