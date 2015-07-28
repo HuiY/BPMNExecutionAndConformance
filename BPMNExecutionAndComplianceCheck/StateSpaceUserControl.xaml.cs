@@ -25,7 +25,7 @@ namespace BPMNExecutionAndComplianceCheck
         }
 
         const double HInter = 20;
-        const double VInter = 20;
+        const double VInter = 60;
         const double ItemWid = 80;
         const double ItemHeg = 40;
         double SINGLEWIDTH = ItemWid + HInter;

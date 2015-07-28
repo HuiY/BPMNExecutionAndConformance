@@ -40,17 +40,15 @@ namespace BPMNExecutionAndComplianceCheck
                     //out.println("new graph BPMN \"BPMN test\"");
                     //out.println("include BPMN.layout");
 
-                    //System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\Public\TestFolder\WriteLines2.txt", true);
-                    fileDirectory = "C:\\GrGenNET\\HuiTestBPMN\\TestConformanceCheckRuleStep\\grbpmnfiles\\" + ((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grbpmn";
+                    fileDirectory = System.Environment.CurrentDirectory+"\\"+((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grs";
+                    //fileDirectory = "C:\\GrGenNET\\HuiTestBPMN\\TestConformanceCheckRuleStep\\grbpmnfiles\\" + ((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grbpmn";
                     System.IO.StreamWriter file = new System.IO.StreamWriter(fileDirectory);
-                    file.WriteLine("new graph BPMNV2 \"BPMN test\"");
-                    file.WriteLine("include BPMN.layout");                
+                    file.WriteLine("new graph BPMNV7 \"BPMN test\"");
+                    //file.WriteLine("include BPMN.layout");                
 
-			        parseProcess((XmlElement) process,file,out flag);
-
-			        //file.close();
+			        parseProcess((XmlElement) process,file,out flag);			        
                     file.Close();
-                    //fileDirectory = System.Environment.CurrentDirectory+"\\"+((XmlElement)process).GetAttribute(ATTRIBUTE_NAME) + ".grs";
+                    
                     //fileDirectory = "C:\\GrGenNET\\HuiTestBPMN\\TestConformanceCheckRuleStep\\grbpmnfiles\\"+((XmlElement)process).GetAttribute(ATTRIBUTE_NAME)+".grbpmn";
 		        }                
                     
