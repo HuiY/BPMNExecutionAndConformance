@@ -172,8 +172,8 @@ namespace BPMNExecutionAndComplianceCheck
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.FileName = "Document";
-            dlg.DefaultExt = ".xml";
-            dlg.Filter = "Xml documents (.xml)|*.xml";
+            //dlg.DefaultExt = ".xml";
+            dlg.Filter = "XML(*.xml)|*.xml|MXML(*.mxml)|*.mxml";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -384,8 +384,8 @@ namespace BPMNExecutionAndComplianceCheck
             }
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.FileName = "Document";
-            dlg.DefaultExt = ".xml";
-            dlg.Filter = "Xml documents (.xml)|*.xml";
+            //dlg.DefaultExt = ".xml";
+            dlg.Filter = "XML(*.xml)|*.xml|MXML(*.mxml)|*.mxml";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {

@@ -1603,7 +1603,7 @@ namespace BPMNExecutionAndComplianceCheck
             return FilteredCauseNodes;
         }
 
-        public List<AuditTrailEntry> ReadXmlFileForATrace(string filePath)
+        public List<AuditTrailEntry> ReadXmlFileForATrace1(string filePath)
         {
             List<AuditTrailEntry> ln = new List<AuditTrailEntry>();
             XmlReader reader = XmlReader.Create(filePath);
@@ -1639,6 +1639,19 @@ namespace BPMNExecutionAndComplianceCheck
                                     reader.Read();
                                     singleNode.State = reader.Value;
                                     break;
+                                case "Originator":
+                                    reader.Read();
+                                    singleNode.Originator = reader.Value;
+                                    break;
+                                case "Timestamp":
+                                    reader.Read();
+                                    singleNode.Timestamp = Convert.ToDateTime(reader.Value.Replace('T', ' '));
+                                    break;
+                                case "Data":
+                                    reader.ReadSubtree();
+                                   // XmlNodeList auditList = reader.SelectNodes("Observation");
+
+                                    break;
                                 default:
                                     break;
                             }
@@ -1655,7 +1668,39 @@ namespace BPMNExecutionAndComplianceCheck
             }
             return ln;
         }
-
+        public List<AuditTrailEntry> ReadXmlFileForATrace(string filePath)
+        {            
+            XmlDocument xDoc = new XmlDocument();
+            //load up the xml from the location 
+            xDoc.Load(filePath);
+            List<AuditTrailEntry> ln = new List<AuditTrailEntry>(); 
+            XmlNodeList processInstanceList = xDoc.SelectNodes("//ProcessInstance");
+            foreach (XmlNode processInstance in processInstanceList)
+            {
+                ln = new List<AuditTrailEntry>();
+                XmlNodeList auditList = processInstance.SelectNodes("AuditTrailEntry");
+                foreach (XmlNode audit in auditList)
+                {
+                    AuditTrailEntry sglNode = new AuditTrailEntry();
+                    sglNode.Name = audit.SelectSingleNode("WorkflowModelElement").InnerText.Replace("-", "").Replace(" ", "_"); 
+                    sglNode.State= audit.SelectSingleNode("EventType").InnerText;
+                    string datatimestr = audit.SelectSingleNode("Timestamp").InnerText;
+                    sglNode.Timestamp = Convert.ToDateTime(datatimestr.Replace('T', ' '));
+                    sglNode.Originator = audit.SelectSingleNode("Originator").InnerText;
+                    XmlNodeList attributes = audit.SelectNodes("Data/Attribute");
+                    foreach (XmlNode atti in attributes)
+                    {
+                        Attribute attiIn = new Attribute();
+                        attiIn.Name=atti.Attributes["name"].Value;
+                        attiIn.AttriValue = atti.InnerText;
+                        sglNode.Data.Add(attiIn);
+                    }
+                    ln.Add(sglNode);
+                    //ID++;
+                }
+            }
+            return ln;
+        }
         public List<ActionNode> FilteringCauseNodesForConformanceCheck(List<CauseNode> CauseNodeList)
         {
             List<ActionNode> FMarkingList = new List<ActionNode>();
@@ -2784,37 +2829,80 @@ namespace BPMNExecutionAndComplianceCheck
         //    }
         //}
 
+        //public List<List<AuditTrailEntry>> ReadLogFileForLog(string filePath)
+        //{
+        //    List<List<AuditTrailEntry>> logFile = new List<List<AuditTrailEntry>>();
+        //    XmlDocument xDoc = new XmlDocument();
+
+        //    //load up the xml from the location 
+        //    xDoc.Load(filePath);
+
+        //    XmlNodeList processInstanceList = xDoc.SelectNodes("//ProcessInstance");
+        //    foreach (XmlNode processInstance in processInstanceList)
+        //    {
+        //        List<AuditTrailEntry> pIns = new List<AuditTrailEntry>();
+        //        XmlNodeList auditList = processInstance.SelectNodes("AuditTrailEntry");
+        //        int ID = 0;
+        //        foreach (XmlNode audit in auditList)
+        //        {
+        //            AuditTrailEntry sglNode = new AuditTrailEntry();
+        //            string workflowModelElement = audit.SelectSingleNode("WorkflowModelElement").InnerText;
+        //            string eventType = audit.SelectSingleNode("EventType").InnerText;
+        //            sglNode.Name = workflowModelElement.Replace("-","").Replace(" ","_");
+        //            sglNode.State = eventType;
+        //            sglNode.ID = ID.ToString();
+        //            pIns.Add(sglNode);
+        //            ID++;
+        //        }
+        //        bool flagComplete = (pIns.FindIndex(x => x.State == "complete") > -1 ? true : false);
+        //        this.flagOnlyStart = !flagComplete;
+        //        logFile.Add(pIns);
+        //    }
+        //    return logFile;
+        //}
         public List<List<AuditTrailEntry>> ReadLogFileForLog(string filePath)
         {
             List<List<AuditTrailEntry>> logFile = new List<List<AuditTrailEntry>>();
-            XmlDocument xDoc = new XmlDocument();
-
+                
+             XmlDocument xDoc = new XmlDocument();
             //load up the xml from the location 
             xDoc.Load(filePath);
-
+            
             XmlNodeList processInstanceList = xDoc.SelectNodes("//ProcessInstance");
             foreach (XmlNode processInstance in processInstanceList)
             {
-                List<AuditTrailEntry> pIns = new List<AuditTrailEntry>();
+                List<AuditTrailEntry> ln = new List<AuditTrailEntry>();
                 XmlNodeList auditList = processInstance.SelectNodes("AuditTrailEntry");
                 int ID = 0;
                 foreach (XmlNode audit in auditList)
                 {
                     AuditTrailEntry sglNode = new AuditTrailEntry();
-                    string workflowModelElement = audit.SelectSingleNode("WorkflowModelElement").InnerText;
-                    string eventType = audit.SelectSingleNode("EventType").InnerText;
-                    sglNode.Name = workflowModelElement.Replace("-","").Replace(" ","_");
-                    sglNode.State = eventType;
-                    sglNode.ID = ID.ToString();
-                    pIns.Add(sglNode);
+                    sglNode.Name = audit.SelectSingleNode("WorkflowModelElement").InnerText.Replace("-", "").Replace(" ", "_");
+                    sglNode.State = audit.SelectSingleNode("EventType").InnerText;
+                    string datatimestr = audit.SelectSingleNode("Timestamp").InnerText;
+                    sglNode.Timestamp = Convert.ToDateTime(datatimestr.Replace('T', ' '));
+                    sglNode.Originator = audit.SelectSingleNode("Originator").InnerText;
+                    XmlNodeList attributes = audit.SelectNodes("Data/Attribute");
+                    foreach (XmlNode atti in attributes)
+                    {
+                        Attribute attiIn = new Attribute();
+                        attiIn.Name = atti.Attributes["name"].Value;
+                        attiIn.AttriValue = atti.InnerText;
+                        sglNode.Data.Add(attiIn);
+                    }
+                    sglNode.ID = ID.ToString();                  
+                   
+                    ln.Add(sglNode);
                     ID++;
+                   
                 }
-                bool flagComplete = (pIns.FindIndex(x => x.State == "complete") > -1 ? true : false);
+                bool flagComplete = (ln.FindIndex(x => x.State == "complete") > -1 ? true : false);
                 this.flagOnlyStart = !flagComplete;
-                logFile.Add(pIns);
-            }
+                logFile.Add(ln);
+            }           
             return logFile;
         }
+        
         private List<AuditTrailEntry> ExractingActivitiesSetFromLog(List<List<AuditTrailEntry>> logFile)
         {
             List<AuditTrailEntry> activitiesSet = new List<AuditTrailEntry>();

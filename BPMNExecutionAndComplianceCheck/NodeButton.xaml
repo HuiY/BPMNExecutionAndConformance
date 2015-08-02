@@ -14,7 +14,7 @@
                     <AccessText TextWrapping="Wrap" Name="label2" Text="xxxxx"/>
                 </Label.Content>
             </Label>
-            <TextBlock  Canvas.ZIndex="2" Text="UU" Height="40" Name="SID" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="0,0,0,0" Width="200" 
+            <TextBlock  Canvas.ZIndex="2" Text="UU" Height="40" Name="hiddenText" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" Margin="0,0,0,0" Width="200" 
                 Foreground="Red" Visibility="Hidden">
             </TextBlock >
         </Canvas>

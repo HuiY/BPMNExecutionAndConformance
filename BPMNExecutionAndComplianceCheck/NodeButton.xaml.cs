@@ -49,7 +49,7 @@ namespace BPMNExecutionAndComplianceCheck
             this.label2.Text = description;
             this.ID = ID;
             //this.SID.Text = description;
-            this.SID.Text = ID;
+            this.hiddenText.Text = ID;
             //if (!flagOfHide)
             //{
             //    LinearGradientBrush br = new LinearGradientBrush(Colors.Red,Colors.Orange,90);
@@ -60,6 +60,16 @@ namespace BPMNExecutionAndComplianceCheck
             //    SolidColorBrush br = new SolidColorBrush(Colors.Yellow);
             //    this.ellipse1.Fill = br;
             //}
+        }
+
+        public NodeButton(string ID, string description, bool flagOfHide, string HidenText)
+        {
+            InitializeComponent();
+            this.label2.Text = description;
+            this.ID = ID;
+            //this.hiddenText.Text = description;
+            this.hiddenText.Text = HidenText;
+            this.hiddenText.FontSize = 30;
         }
 
         private void OnMouseDown_NodeButton(object sender, MouseButtonEventArgs e)
@@ -86,7 +96,7 @@ namespace BPMNExecutionAndComplianceCheck
             var block = sender as Canvas;
             if (block != null)
             {
-                SID.Visibility = Visibility.Visible;
+                hiddenText.Visibility = Visibility.Visible;
             }
         }
 
@@ -96,7 +106,7 @@ namespace BPMNExecutionAndComplianceCheck
             var block = sender as Canvas;
             if (block != null)
             {
-                SID.Visibility = Visibility.Hidden;
+                hiddenText.Visibility = Visibility.Hidden;
             }
         }       
     }

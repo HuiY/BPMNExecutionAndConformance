@@ -207,6 +207,14 @@ namespace BPMNExecutionAndComplianceCheck
         public String State;
         public string Name;
         public string ID;
+        public DateTime Timestamp;
+        public string Originator;
+        public List<Attribute> Data=new List<Attribute>();
+    }
+    public class Attribute
+    {
+        public string Name;
+        public string AttriValue;
     }
     public class HMarking
     {
