@@ -1288,13 +1288,13 @@ namespace BPMNExecutionAndComplianceCheck
                     if (listLoop.Find(x => x.TaskID == c.ActivityEle.ID) != null)
                     {
                         c.ActivityEle.Type = TypeOfElement.LoopTask;
-                        c.ActivityEle.Name = listTask.Find(x => x.ID == c.ActivityEle.ID).Name;
+                        c.ActivityEle.Name = listTask.Find(x => x.ID == c.ActivityEle.ID).Name.Replace("-", "").Replace(" ", "_");
 
                     }
                     else
                     {
                         c.ActivityEle.Type = TypeOfElement.Task;
-                        c.ActivityEle.Name = listTask.Find(x => x.ID == c.ActivityEle.ID).Name;
+                        c.ActivityEle.Name = listTask.Find(x => x.ID == c.ActivityEle.ID).Name.Replace("-", "").Replace(" ", "_");
                     }
                 }
                 if (listGateway.Find(x => x.ID == c.ActivityEle.ID) != null)
@@ -1319,17 +1319,17 @@ namespace BPMNExecutionAndComplianceCheck
                 if (listBlock.Find(x => x.ID == c.ActivityEle.ID) != null)
                 {
                     c.ActivityEle.Type = TypeOfElement.BlockActivity;
-                    c.ActivityEle.Name = listBlock.Find(x => x.ID == c.ActivityEle.ID).Name;
+                    c.ActivityEle.Name = listBlock.Find(x => x.ID == c.ActivityEle.ID).Name.Replace("-", "").Replace(" ", "_");
                 }
                 if (listCatch.Find(x => x.ID == c.ActivityEle.ID) != null)
                 {
                     c.ActivityEle.Type = TypeOfElement.IntermediateCatchEvent;
-                    c.ActivityEle.Name = listCatch.Find(x => x.ID == c.ActivityEle.ID).Name;
+                    c.ActivityEle.Name = listCatch.Find(x => x.ID == c.ActivityEle.ID).Name.Replace("-", "").Replace(" ", "_");
                 }
                 if (listThrow.Find(x => x.ID == c.ActivityEle.ID) != null)
                 {
                     c.ActivityEle.Type = TypeOfElement.IntermediateThrowEvent;
-                    c.ActivityEle.Name = listThrow.Find(x => x.ID == c.ActivityEle.ID).Name;
+                    c.ActivityEle.Name = listThrow.Find(x => x.ID == c.ActivityEle.ID).Name.Replace("-", "").Replace(" ", "_");
                 }
                 #endregion
             }
@@ -1372,8 +1372,6 @@ namespace BPMNExecutionAndComplianceCheck
                     int ind1 = MarkingList.FindIndex(x => x.ID == listPi2Mark[ind0].MarkID);
                     MarkingList[ind1].ProcessInState = p.State;
                 }
-
-
             }
             #region Filling Marking's elements
             foreach (EdgeTokens edge in listEdgeTokens)
@@ -1398,7 +1396,7 @@ namespace BPMNExecutionAndComplianceCheck
                             {
                                 Element e = new Element();
                                 e.Type = TypeOfElement.Task;
-                                e.Name = listTask.Find(x => x.ID == edge.ContainerID).Name;
+                                e.Name = listTask.Find(x => x.ID == edge.ContainerID).Name.Replace("-", "").Replace(" ", "_");
                                 MarkingList[n3].ElmentList.Add(e);
                             }
                         }
@@ -1683,18 +1681,27 @@ namespace BPMNExecutionAndComplianceCheck
                 {
                     AuditTrailEntry sglNode = new AuditTrailEntry();
                     sglNode.Name = audit.SelectSingleNode("WorkflowModelElement").InnerText.Replace("-", "").Replace(" ", "_"); 
-                    sglNode.State= audit.SelectSingleNode("EventType").InnerText;
-                    string datatimestr = audit.SelectSingleNode("Timestamp").InnerText;
-                    sglNode.Timestamp = Convert.ToDateTime(datatimestr.Replace('T', ' '));
-                    sglNode.Originator = audit.SelectSingleNode("Originator").InnerText;
-                    XmlNodeList attributes = audit.SelectNodes("Data/Attribute");
-                    foreach (XmlNode atti in attributes)
+                    sglNode.State= audit.SelectSingleNode("EventType").InnerText.ToLower();
+                    if (audit.SelectSingleNode("Timestamp") != null)
                     {
-                        Attribute attiIn = new Attribute();
-                        attiIn.Name=atti.Attributes["name"].Value;
-                        attiIn.AttriValue = atti.InnerText;
-                        sglNode.Data.Add(attiIn);
+                        string datatimestr = audit.SelectSingleNode("Timestamp").InnerText;
+                        sglNode.Timestamp = Convert.ToDateTime(datatimestr.Replace('T', ' '));
                     }
+                    if (audit.SelectSingleNode("Originator") != null)
+                    {
+                        sglNode.Originator = audit.SelectSingleNode("Originator").InnerText;
+                    }
+                    if (audit.SelectNodes("Data/Attribute") != null)
+                    {
+                        XmlNodeList attributes = audit.SelectNodes("Data/Attribute");
+                        foreach (XmlNode atti in attributes)
+                        {
+                            Attribute attiIn = new Attribute();
+                            attiIn.Name = atti.Attributes["name"].Value;
+                            attiIn.AttriValue = atti.InnerText;
+                            sglNode.Data.Add(attiIn);
+                        }
+                    }                    
                     ln.Add(sglNode);
                     //ID++;
                 }
@@ -2878,23 +2885,30 @@ namespace BPMNExecutionAndComplianceCheck
                 {
                     AuditTrailEntry sglNode = new AuditTrailEntry();
                     sglNode.Name = audit.SelectSingleNode("WorkflowModelElement").InnerText.Replace("-", "").Replace(" ", "_");
-                    sglNode.State = audit.SelectSingleNode("EventType").InnerText;
-                    string datatimestr = audit.SelectSingleNode("Timestamp").InnerText;
-                    sglNode.Timestamp = Convert.ToDateTime(datatimestr.Replace('T', ' '));
-                    sglNode.Originator = audit.SelectSingleNode("Originator").InnerText;
-                    XmlNodeList attributes = audit.SelectNodes("Data/Attribute");
-                    foreach (XmlNode atti in attributes)
+                    sglNode.State = audit.SelectSingleNode("EventType").InnerText.ToLower();
+                    if (audit.SelectSingleNode("Timestamp") != null)
                     {
-                        Attribute attiIn = new Attribute();
-                        attiIn.Name = atti.Attributes["name"].Value;
-                        attiIn.AttriValue = atti.InnerText;
-                        sglNode.Data.Add(attiIn);
+                        string datatimestr = audit.SelectSingleNode("Timestamp").InnerText;
+                        sglNode.Timestamp = Convert.ToDateTime(datatimestr.Replace('T', ' '));
                     }
-                    sglNode.ID = ID.ToString();                  
-                   
+                    if (audit.SelectSingleNode("Originator") != null)
+                    {
+                        sglNode.Originator = audit.SelectSingleNode("Originator").InnerText;
+                    }
+                    if (audit.SelectNodes("Data/Attribute") != null)
+                    {
+                        XmlNodeList attributes = audit.SelectNodes("Data/Attribute");
+                        foreach (XmlNode atti in attributes)
+                        {
+                            Attribute attiIn = new Attribute();
+                            attiIn.Name = atti.Attributes["name"].Value;
+                            attiIn.AttriValue = atti.InnerText;
+                            sglNode.Data.Add(attiIn);
+                        }
+                    }
+                    sglNode.ID = ID.ToString();
                     ln.Add(sglNode);
-                    ID++;
-                   
+                    ID++;                   
                 }
                 bool flagComplete = (ln.FindIndex(x => x.State == "complete") > -1 ? true : false);
                 this.flagOnlyStart = !flagComplete;
