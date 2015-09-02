@@ -3044,5 +3044,107 @@ namespace BPMNExecutionAndComplianceCheck
             #endregion
             return dtForShow;
         }
+
+        public List<List<AMatch>> PreparingDataForModelPerspective(List<List<AMatch>> alignmentTable)
+        {
+            List<List<AMatch>> result = new List<List<AMatch>>();
+
+            foreach (List<AMatch> onealign in alignmentTable)
+            {
+                #region parse bothfake type
+                for (int i = 1; i < onealign.Count; i++)
+                {
+                    if (onealign[i].MatchType == TypeOfMatch.BothFake)
+                    {
+                        if (onealign[i].TaskMarking.ID == onealign[i - 1].TaskMarking.ID)
+                        {
+                            onealign[i].MatchType = TypeOfMatch.FTaskCEntry;
+                        }
+                        else if (onealign[i].Entry.ID == onealign[i - 1].Entry.ID)
+                        {
+                            onealign[i].MatchType = TypeOfMatch.CTaskFEntry;
+                        }
+                    }
+                }
+                #endregion
+                for (int i=0;i<onealign.Count;i++)
+                {
+                    if (onealign[i].MatchType == TypeOfMatch.NotMatched)
+                    {
+                        if (i + 1 == onealign.Count)
+                        {
+                            //i is the last match in onealign
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
+                        {
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
+                        {
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
+                        {
+                        }
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.FTaskCEntry)
+                    {
+                        if (i + 1 == onealign.Count)
+                        {
+                            //i is the last match in onealign
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
+                        {
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
+                        {
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
+                        {
+                        }
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.CTaskFEntry)
+                    {
+                        if (i + 1 == onealign.Count)
+                        {
+                            //i is the last match in onealign
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
+                        {
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
+                        {
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
+                        {
+                        }
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.BothCorrect)
+                    {
+                        if (i + 1 == onealign.Count)
+                        {
+                            //i is the last match in onealign
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
+                        {
+
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
+                        {
+                        }
+                        else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
+                        {
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

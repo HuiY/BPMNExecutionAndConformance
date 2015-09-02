@@ -261,11 +261,13 @@ namespace BPMNExecutionAndComplianceCheck
             }
             else
             {
+                //showing when the input is a log
                 List<List<AMatch>> resultOfLog = new List<List<AMatch>>();
                 Stopwatch sw = new Stopwatch();
                 long frequency = Stopwatch.Frequency;
                 int numberOfTrace = 1;
                 string numberOfNodes="";
+                List<List<AMatch>> alignmentTable=new List<List<AMatch>>();
                 sw.Start();
                 foreach (var trace in this.listTraces)
                 {
@@ -278,7 +280,7 @@ namespace BPMNExecutionAndComplianceCheck
                     }
                     List<AMatch> matchTree = ConstructTheMatchTree(this.StructuredMarkingList, newlistAuditEntry, out leaf);
                     numberOfNodes = matchTree.Count.ToString();
-                    List<List<AMatch>> alignmentTable = GetAllAlignmentResults(matchTree, leaf);    
+                    alignmentTable = GetAllAlignmentResults(matchTree, leaf);    
                     //to indicate the number
                     foreach(var align in alignmentTable)
                     {
@@ -288,6 +290,8 @@ namespace BPMNExecutionAndComplianceCheck
                     numberOfTrace++;
                 }
                 sw.Stop();
+                //preparing the alignmentTable into a BPMN result
+                List<List<AMatch>> resultFromModel = PreparingDataForModelPerspective(alignmentTable);
                 string miSeconds = sw.ElapsedMilliseconds.ToString();
                 int max = resultOfLog.Max(x => x.Count);
                 DataTable dtForShow = new DataTable();     
