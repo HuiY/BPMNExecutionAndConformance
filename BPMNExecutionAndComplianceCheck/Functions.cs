@@ -1677,6 +1677,7 @@ namespace BPMNExecutionAndComplianceCheck
             {
                 ln = new List<AuditTrailEntry>();
                 XmlNodeList auditList = processInstance.SelectNodes("AuditTrailEntry");
+                int ID = 0;
                 foreach (XmlNode audit in auditList)
                 {
                     AuditTrailEntry sglNode = new AuditTrailEntry();
@@ -1703,6 +1704,8 @@ namespace BPMNExecutionAndComplianceCheck
                         }
                     }                    
                     ln.Add(sglNode);
+                    sglNode.ID = ID.ToString();                    
+                    ID++;
                     //ID++;
                 }
             }
