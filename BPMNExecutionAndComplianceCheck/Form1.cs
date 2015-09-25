@@ -237,7 +237,7 @@ namespace BPMNExecutionAndComplianceCheck
             }            
             List<ActionNode> layeredLsModel = this.MaxXYDev(this.StructuredMarkingList, out this.maxLayerDev);
 
-            this.dynamicParameter = (double)(1 / (double)2*((double)(2*this.maxLayerDev - 1)));
+            this.dynamicParameter = (double)(1 / ((double)2*((double)(2*this.maxLayerDev - 1))));
 
             if (this.FlagOfTrace == true)
             {
@@ -267,10 +267,12 @@ namespace BPMNExecutionAndComplianceCheck
                 long frequency = Stopwatch.Frequency;
                 int numberOfTrace = 1;
                 string numberOfNodes="";
-                List<List<AMatch>> alignmentTable=new List<List<AMatch>>();
+                List<List<AMatch>> reOneResOneTrace = new List<List<AMatch>>();
+
                 sw.Start();
                 foreach (var trace in this.listTraces)
                 {
+                    List<List<AMatch>> alignmentTable = new List<List<AMatch>>();
                     List<AMatch> leaf = new List<AMatch>();
 
                     List<AuditTrailEntry> newlistAuditEntry = new List<AuditTrailEntry>();
@@ -286,13 +288,17 @@ namespace BPMNExecutionAndComplianceCheck
                     {
                         align[0].TraceID = numberOfTrace.ToString();
                     }
-                    resultOfLog.AddRange(alignmentTable);
+                    //resultOfLog.AddRange(alignmentTable);
+                    resultOfLog.Add(alignmentTable[0]);
+                    reOneResOneTrace.Add(alignmentTable[0]);
                     numberOfTrace++;
                 }
                 sw.Stop();
                 //preparing the alignmentTable into a BPMN result
-                List<List<AMatch>> resultFromModel = PreparingDataForModelPerspective(alignmentTable);
+                List<CauseNodeAndOcc> resultFromModel = new List<CauseNodeAndOcc>(); 
+                List<ConnectedPairFromModel> resultFromLog = PreparingDataForModelPerspective(reOneResOneTrace, ref resultFromModel);
                 string miSeconds = sw.ElapsedMilliseconds.ToString();
+                #region showing detailed results
                 int max = resultOfLog.Max(x => x.Count);
                 DataTable dtForShow = new DataTable();     
                 //added trace number
@@ -300,9 +306,11 @@ namespace BPMNExecutionAndComplianceCheck
                 {
                     dtForShow.Columns.Add(i.ToString(), typeof(string));
                 }
-                #region to show
+                int numberOfDevTraces = 0;
+                
                 foreach (var alignment in resultOfLog)
                 {
+                    bool flagDev = false;
                     DataRow rowLog = dtForShow.NewRow();
                     DataRow rowModel = dtForShow.NewRow();
                     //
@@ -319,10 +327,12 @@ namespace BPMNExecutionAndComplianceCheck
                             case TypeOfMatch.CTaskFEntry:
                                 rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
                                 rowLog[colNum] = " ┴ ";
+                                flagDev = true;
                                 break;
                             case TypeOfMatch.FTaskCEntry:
                                 rowLog[colNum] = alignment[i].Entry.Name;
                                 rowModel[colNum] = " ┴ ";
+                                flagDev = true;
                                 break;
                             case TypeOfMatch.BothFake:
                                 if (alignment[i].TaskMarking.ID == alignment[i - 1].TaskMarking.ID)
@@ -335,10 +345,15 @@ namespace BPMNExecutionAndComplianceCheck
                                     rowModel[colNum] = alignment[i].TaskMarking.Elment.Name;
                                     rowLog[colNum] = " ┴ ";
                                 }
+                                flagDev = true;
                                 break;
                         }                        
-                        colNum++;
-                    }                    
+                        colNum++;                        
+                    }
+                    if (flagDev)
+                    {
+                        numberOfDevTraces++;
+                    }
                     dtForShow.Rows.Add(rowLog);
                     dtForShow.Rows.Add(rowModel);
                     DataRow emptyR = dtForShow.NewRow();
@@ -346,8 +361,82 @@ namespace BPMNExecutionAndComplianceCheck
                 }
                 this.DataViewForAlignment.DataSource = dtForShow.AsDataView();
                 this.resultDataTable = dtForShow;
-                #endregion                   
-                string show = "Succeed ! And takes " + miSeconds + "ms. And number of nodes is" + numberOfNodes;
+                #endregion
+
+                #region showing overall results
+                             
+                //for model  
+                DataTable dtForModel = new DataTable();               
+                for (int i = 0; i < resultFromModel.Count+1; i++)
+                {
+                    dtForModel.Columns.Add(i.ToString(), typeof(string));
+                }
+                DataRow rowTask = dtForModel.NewRow();
+                rowTask[0] = "Activity";
+                DataRow rowNumOfOcc = dtForModel.NewRow();
+                rowNumOfOcc[0] = "Number Of Occurance";
+                DataRow rowNumOfMiss = dtForModel.NewRow();
+                rowNumOfMiss[0] = "Number Of Missing";        
+                for(int i=0;i<resultFromModel.Count;i++)
+                {
+                    rowTask[i + 1] =resultFromModel[i].Task.Elment.Name;
+                    rowNumOfOcc[i + 1] = resultFromModel[i].NumberOfOcc;
+                    rowNumOfMiss[i + 1] = resultFromModel[i].NumberOfMiss;
+                }
+                dtForModel.Rows.Add(rowTask);
+                dtForModel.Rows.Add(rowNumOfOcc);               
+                dtForModel.Rows.Add(rowNumOfMiss);
+                this.dataGridViewModel.DataSource = dtForModel.AsDataView();
+
+                //for logs' part
+                DataTable dtForLog = new DataTable();
+                int countOfCo = resultFromLog.Sum(x=>x.AddedEventsInBetween.Count);
+                for (int i = 0; i < countOfCo + 1; i++)
+                {
+                    dtForLog.Columns.Add(i.ToString(), typeof(string));
+                }
+                DataRow rowEvent = dtForLog.NewRow();
+                rowEvent[0] = "Added Events";
+                DataRow rowPre = dtForLog.NewRow();
+                rowPre[0] = "Pre-Task";
+                DataRow rowNext = dtForLog.NewRow();
+                rowNext[0] = "Next-Task";
+                DataRow rowOccu = dtForLog.NewRow();
+                rowOccu[0] = "Occurance Times";
+
+                int pos = 1;
+                for(int i=0;i<resultFromLog.Count;i++)
+                {
+                    for (int j = 0; j < resultFromLog[i].AddedEventsInBetween.Count; j++)
+                    {                        
+                        rowEvent[pos] = resultFromLog[i].AddedEventsInBetween[j].Event.Name;
+                        rowOccu[pos] = resultFromLog[i].AddedEventsInBetween[j].NumberOfOcc;
+                        if (resultFromLog[i].PreAction == null || resultFromLog[i].PreAction.ID==null)
+                        {
+                            rowPre[pos] = "Null";                            
+                        }
+                        else
+                        {
+                            rowPre[pos] = resultFromLog[i].PreAction.Elment.Name;
+                        }
+                        if (resultFromLog[i].NextAction==null || resultFromLog[i].NextAction.ID==null)
+                        {
+                            rowNext[pos] = "Null";                           
+                        }
+                        else
+                        {
+                            rowNext[pos] = resultFromLog[i].NextAction.Elment.Name;
+                        }
+                        pos++;                   
+                    }
+                }
+                dtForLog.Rows.Add(rowEvent);
+                dtForLog.Rows.Add(rowPre);
+                dtForLog.Rows.Add(rowNext);
+                dtForLog.Rows.Add(rowOccu);
+                this.dataGridViewLog.DataSource = dtForLog.AsDataView();
+                #endregion
+                string show = "Succeed ! And takes " + miSeconds + "ms. And number of nodes is" + numberOfNodes+" And number of dev traces is "+numberOfDevTraces.ToString();
                 MessageBox.Show(show);                
             }
         }

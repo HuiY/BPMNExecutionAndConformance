@@ -1,6 +1,6 @@
 // This file has been generated automatically by GrGen (www.grgen.net)
 // Do not modify this file! Any changes will be lost!
-// Generated from "BPMNV7.grg" on Sun Jun 28 17:37:29 CST 2015
+// Generated from "BPMNV7.grg" on Wed Sep 09 11:08:53 CST 2015
 
 using System;
 using System.Collections.Generic;

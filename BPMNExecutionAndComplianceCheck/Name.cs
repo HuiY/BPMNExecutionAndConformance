@@ -262,4 +262,24 @@ namespace BPMNExecutionAndComplianceCheck
         public bool HIDE;
         public int Layer;
     }
+    public class AddedEvents
+    {
+        public AuditTrailEntry Event;
+        public int NumberOfOcc;
+        
+    }
+    public class CauseNodeAndOcc
+    {
+        public ActionNode Task;
+        //number of both correct
+        public int NumberOfOcc;
+        //number of correct task fake entry
+        public int NumberOfMiss;
+    }
+    public class ConnectedPairFromModel
+    {
+        public ActionNode PreAction = new ActionNode();
+        public ActionNode NextAction = new ActionNode();
+        public List<AddedEvents> AddedEventsInBetween = new List<AddedEvents>(); 
+    }
 }

@@ -52,11 +52,18 @@
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.button1 = new System.Windows.Forms.Button();
             this.btn_save = new System.Windows.Forms.Button();
+            this.dataGridViewModel = new System.Windows.Forms.DataGridView();
+            this.dataGridViewLog = new System.Windows.Forms.DataGridView();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.BPMNExec.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DataViewForAlignment)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewModel)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewLog)).BeginInit();
             this.SuspendLayout();
             // 
             // BPMNExec
@@ -232,7 +239,7 @@
             // 
             this.elementHost1.Location = new System.Drawing.Point(9, 150);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(1200, 800);
+            this.elementHost1.Size = new System.Drawing.Size(730, 800);
             this.elementHost1.TabIndex = 22;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
@@ -240,9 +247,9 @@
             // DataViewForAlignment
             // 
             this.DataViewForAlignment.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.DataViewForAlignment.Location = new System.Drawing.Point(1223, 75);
+            this.DataViewForAlignment.Location = new System.Drawing.Point(745, 523);
             this.DataViewForAlignment.Name = "DataViewForAlignment";
-            this.DataViewForAlignment.Size = new System.Drawing.Size(585, 490);
+            this.DataViewForAlignment.Size = new System.Drawing.Size(1063, 128);
             this.DataViewForAlignment.TabIndex = 29;
             // 
             // btn_Show
@@ -268,7 +275,7 @@
             // 
             // btn_save
             // 
-            this.btn_save.Location = new System.Drawing.Point(1699, 584);
+            this.btn_save.Location = new System.Drawing.Point(1733, 937);
             this.btn_save.Name = "btn_save";
             this.btn_save.Size = new System.Drawing.Size(75, 21);
             this.btn_save.TabIndex = 32;
@@ -276,12 +283,60 @@
             this.btn_save.UseVisualStyleBackColor = true;
             this.btn_save.Click += new System.EventHandler(this.btn_save_Click);
             // 
+            // dataGridViewModel
+            // 
+            this.dataGridViewModel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewModel.Location = new System.Drawing.Point(745, 669);
+            this.dataGridViewModel.Name = "dataGridViewModel";
+            this.dataGridViewModel.Size = new System.Drawing.Size(1063, 122);
+            this.dataGridViewModel.TabIndex = 33;
+            // 
+            // dataGridViewLog
+            // 
+            this.dataGridViewLog.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewLog.Location = new System.Drawing.Point(745, 809);
+            this.dataGridViewLog.Name = "dataGridViewLog";
+            this.dataGridViewLog.Size = new System.Drawing.Size(1063, 126);
+            this.dataGridViewLog.TabIndex = 34;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(745, 654);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(215, 12);
+            this.label4.TabIndex = 35;
+            this.label4.Text = "Results of activities in the model:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(745, 794);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(179, 12);
+            this.label5.TabIndex = 36;
+            this.label5.Text = "Results of events in the log:";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(745, 508);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(161, 12);
+            this.label6.TabIndex = 37;
+            this.label6.Text = "Results of patient traces:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.ClientSize = new System.Drawing.Size(1813, 959);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.dataGridViewLog);
+            this.Controls.Add(this.dataGridViewModel);
             this.Controls.Add(this.btn_save);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btn_DevCheck);
@@ -302,6 +357,8 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DataViewForAlignment)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewModel)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewLog)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -332,6 +389,11 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button btn_save;
+        private System.Windows.Forms.DataGridView dataGridViewModel;
+        private System.Windows.Forms.DataGridView dataGridViewLog;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
     }
 }
 
