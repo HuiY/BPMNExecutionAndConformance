@@ -1972,11 +1972,13 @@ namespace BPMNExecutionAndComplianceCheck
                 List<string> tobeList = new List<string>();
                 if (layerInfoMatrix[imaxLayer].Count > 0)
                 {
+                    //firstly assign a layer to the maximum layer as imaxLayer+1, which means layer starts from 1, 0 works as a non-assigned version
                     foreach (string s in layerInfoMatrix[imaxLayer])
                     {
                         curNodeIndex = FMarkingList.FindIndex(delegate(ActionNode a) { return a.ID == s; });
                         FMarkingList[curNodeIndex].Layer = imaxLayer + 1;
                     }
+                    //then, for its nextmarkings, if its layer is 
                     foreach (string s in layerInfoMatrix[imaxLayer])
                     {
                         curNodeIndex = FMarkingList.FindIndex(delegate(ActionNode a) { return a.ID == s; });
@@ -2397,8 +2399,7 @@ namespace BPMNExecutionAndComplianceCheck
             
 
             while (TailMatchSet.Count >0)
-            {               
-            
+            {
                 #region exploration of tree
                 int loOfCurEntry;
                 int loOfCurEleInMdl;
@@ -2522,6 +2523,8 @@ namespace BPMNExecutionAndComplianceCheck
                                 //Previous version is only combine nodes who generated at the same time, now we changed into a new version where newly added node combined with a node in the existing tree.
                                 //int joinedId = ToJoinList.FindIndex(x => (BcMatch.TaskMarking.Layer == x.TaskMarking.Layer) && (BcMatch.Entry.ID == x.Entry.ID));
                                 int IDinTree = MatchesTree.FindIndex(x => (BcMatch.TaskMarking.ID == x.TaskMarking.ID) && (BcMatch.Entry.ID == x.Entry.ID) && (x.MatchType == TypeOfMatch.BothCorrect) && (x.Deviations == BcMatch.Deviations) && (x.Cost == BcMatch.Cost));
+                                int IDinTree1 = MatchesTree.FindIndex(x => (BcMatch.TaskMarking.ID == x.TaskMarking.ID) && (BcMatch.Entry.ID == x.Entry.ID) && (x.MatchType == TypeOfMatch.BothCorrect) && (x.Deviations == BcMatch.Deviations) && (x.Cost == BcMatch.Cost));
+
                                 //if (joinedId > -1)
                                 if (IDinTree > -1)
                                 {
@@ -2582,6 +2585,7 @@ namespace BPMNExecutionAndComplianceCheck
                             //MatchesTree.Add(FTaskCEntry);
 
                             int IDinTree = MatchesTree.FindIndex(x => (FTaskCEntry.TaskMarking.ID == x.TaskMarking.ID) && (FTaskCEntry.Entry.ID == x.Entry.ID) && (FTaskCEntry.Cost == x.Cost));
+                            int IDinTree1 = MatchesTree.FindIndex(x => (FTaskCEntry.TaskMarking.ID == x.TaskMarking.ID) && (FTaskCEntry.Entry.ID == x.Entry.ID));
 
                             if (IDinTree > -1)
                             {
@@ -2658,7 +2662,9 @@ namespace BPMNExecutionAndComplianceCheck
                             //LabelMatched = true;
                             //MatchesTree.Add(CTaskFEntry);
 
+                            //int IDinTree = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
                             int IDinTree = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
+                            int IDinTree1 = MatchesTree.FindIndex(x => (CTaskFEntry.TaskMarking.ID == x.TaskMarking.ID) && (CTaskFEntry.Entry.ID == x.Entry.ID) && (CTaskFEntry.Cost == x.Cost));
 
                             if (IDinTree > -1)
                             {
