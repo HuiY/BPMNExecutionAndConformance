@@ -2980,68 +2980,7 @@ namespace BPMNExecutionAndComplianceCheck
             IEnumerable<List<ActionNode>> orderedNodeSetList = nodeSetList.OrderByDescending(n => n.Count);
             return orderedNodeSetList.ToArray()[0].Count;
         }
-
-        //private List<List<ActionNode>> FindSubPaths(ActionNode startNode, List<ActionNode> originalList)
-        //{
-        //    if (startNode.NextMarkingIDlist.Count != 0)
-        //    {
-        //        List<List<ActionNode>> pathsSetForCur = new List<List<ActionNode>>();
-        //        foreach (var ID in startNode.NextMarkingIDlist)
-        //        {
-        //            ActionNode node = originalList.Find(x => x.ID == ID);
-        //            List<List<ActionNode>> pathsSetForPre = this.FindSubPaths(node, originalList);
-        //            foreach (var completedPath in pathsSetForPre)
-        //            {
-        //                completedPath.Add(node);
-        //            }
-
-        //            pathsSetForCur.AddRange(pathsSetForPre);
-        //        }
-
-        //        return pathsSetForCur;
-        //    }
-        //    else
-        //    {
-        //        List<ActionNode> completedPath = new List<ActionNode>();
-        //        //completedPath.Add(curAMatch);
-        //        List<List<ActionNode>> pathsSetForPre = new List<List<ActionNode>>();
-        //        pathsSetForPre.Add(completedPath);
-
-        //        return pathsSetForPre;
-        //    }
-        //}
-
-        //public List<List<AuditTrailEntry>> ReadLogFileForLog(string filePath)
-        //{
-        //    List<List<AuditTrailEntry>> logFile = new List<List<AuditTrailEntry>>();
-        //    XmlDocument xDoc = new XmlDocument();
-
-        //    //load up the xml from the location 
-        //    xDoc.Load(filePath);
-
-        //    XmlNodeList processInstanceList = xDoc.SelectNodes("//ProcessInstance");
-        //    foreach (XmlNode processInstance in processInstanceList)
-        //    {
-        //        List<AuditTrailEntry> pIns = new List<AuditTrailEntry>();
-        //        XmlNodeList auditList = processInstance.SelectNodes("AuditTrailEntry");
-        //        int ID = 0;
-        //        foreach (XmlNode audit in auditList)
-        //        {
-        //            AuditTrailEntry sglNode = new AuditTrailEntry();
-        //            string workflowModelElement = audit.SelectSingleNode("WorkflowModelElement").InnerText;
-        //            string eventType = audit.SelectSingleNode("EventType").InnerText;
-        //            sglNode.Name = workflowModelElement.Replace("-","").Replace(" ","_");
-        //            sglNode.State = eventType;
-        //            sglNode.ID = ID.ToString();
-        //            pIns.Add(sglNode);
-        //            ID++;
-        //        }
-        //        bool flagComplete = (pIns.FindIndex(x => x.State == "complete") > -1 ? true : false);
-        //        this.flagOnlyStart = !flagComplete;
-        //        logFile.Add(pIns);
-        //    }
-        //    return logFile;
-        //}
+        
         public List<List<AuditTrailEntry>> ReadLogFileForLog(string filePath)
         {
             List<List<AuditTrailEntry>> logFile = new List<List<AuditTrailEntry>>();
@@ -3221,10 +3160,6 @@ namespace BPMNExecutionAndComplianceCheck
 
         public List<ConnectedPairFromModel> PreparingDataForModelPerspective(List<List<AMatch>> alignmentTable,ref List<CauseNodeAndOcc> reCauses)
         {
-            //List<List<AMatch>> reInBetween = new List<List<AMatch>>();
-
-            //List<CauseNodeAndOcc> reCauses = new List<CauseNodeAndOcc>();
-
             List<ConnectedPairFromModel> reInBetween = new List<ConnectedPairFromModel>();
 
             foreach (List<AMatch> onealign in alignmentTable)
@@ -3246,149 +3181,29 @@ namespace BPMNExecutionAndComplianceCheck
                 }
                 #endregion
 
-                //initialize current TaskMarking
-                ActionNode currTask = null;
+                //initialize current TaskMarking， everytime a new alignment starts, currTask is reset to null                
+                ConnectedPairFromModel currCon = new ConnectedPairFromModel();
+                currCon.PreAction = null;
                 for (int i=0;i<onealign.Count;i++)
                 {
-                    if (onealign[i].MatchType == TypeOfMatch.NotMatched)
+                    if (onealign[i].MatchType == TypeOfMatch.FTaskCEntry)
                     {
-                        #region NotMatched continue
-                        //if (i + 1 == onealign.Count)
-                        //{
-                        //    //i is the last match in onealign
+                        AddedEvent addedEvent = new AddedEvent();
+                        addedEvent.Event = onealign[i].Entry;
+                        addedEvent.NumberOfOcc = 1;
 
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
-                        //{
-                        //    ConnectedPairFromModel CTaskM = new ConnectedPairFromModel();
-                        //    CTaskM.PreAction = onealign[i + 1].TaskMarking;
-                        //    resInBetween.Add(CTaskM);
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
-                        //{
-                        //    ConnectedPairFromModel bothM = new ConnectedPairFromModel();
-                        //    bothM.PreAction = onealign[i + 1].TaskMarking;
-                        //    resInBetween.Add(bothM);
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
-                        //{
-                        //    ConnectedPairFromModel FTaskM = new ConnectedPairFromModel();
-                        //    FTaskM.PreAction = null;
-                        //    AddedEvents oneAddedEvents = new AddedEvents();
-                        //    oneAddedEvents.Event = onealign[i].Entry;
-                        //    oneAddedEvents.NumberOfOcc = 1;
-                        //    FTaskM.AddedEventsInBetween.Add(oneAddedEvents);
-                        //    resInBetween.Add(FTaskM);
-                        //}
-                        #endregion
-                    }
-                    else if (onealign[i].MatchType == TypeOfMatch.FTaskCEntry)
-                    {
-                        //adding one added events between currTask as preaction and other actionnode as next actionnode                        
-                        if (currTask == null)
-                        {
-                            #region currTask is null
-                            int indexOfCurrNull = reInBetween.FindIndex(x=>x.PreAction==null);
-                            if (indexOfCurrNull < 0)
-                            {
-                                ConnectedPairFromModel nullCon = new ConnectedPairFromModel();
-                                nullCon.PreAction = null;
-                                AddedEvents addedEvent = new AddedEvents();
-                                addedEvent.Event = onealign[i].Entry;
-                                addedEvent.NumberOfOcc = 1;
-                                nullCon.AddedEventsInBetween.Add(addedEvent);
-                                reInBetween.Add(nullCon);
-                            }
-                            else
-                            {
-                                int indexOfEvent=reInBetween[indexOfCurrNull].AddedEventsInBetween.FindIndex(x=>x.Event==onealign[i].Entry);
-                                if (indexOfEvent < 0)
-                                {
-                                    AddedEvents addedEvent = new AddedEvents();
-                                    addedEvent.Event = onealign[i].Entry;
-                                    addedEvent.NumberOfOcc = 1;
-                                    reInBetween[indexOfCurrNull].AddedEventsInBetween.Add(addedEvent);
-                                }
-                                else
-                                {
-                                    reInBetween[indexOfCurrNull].AddedEventsInBetween[indexOfEvent].NumberOfOcc++;
-                                }                                
-                            }
-                            #endregion
-                        }
-                        else
-                        {
-                            #region currTask is not null
-                            int indexOfCurrTask = reInBetween.FindIndex(x => x.PreAction.ID == currTask.ID);                            
-                            if (indexOfCurrTask < 0)
-                            {
-                                ConnectedPairFromModel nullCon = new ConnectedPairFromModel();
-                                nullCon.PreAction = currTask;
-                                AddedEvents addedEvent = new AddedEvents();
-                                addedEvent.Event = onealign[i].Entry;
-                                addedEvent.NumberOfOcc = 1;
-                                nullCon.AddedEventsInBetween.Add(addedEvent);
-                                reInBetween.Add(nullCon);
-                            }
-                            else
-                            {
-                                int indexOfEvent = reInBetween[indexOfCurrTask].AddedEventsInBetween.FindIndex(x => x.Event.Name == onealign[i].Entry.Name);
-                                if (indexOfEvent < 0)
-                                {
-                                    AddedEvents addedEvent = new AddedEvents();
-                                    addedEvent.Event = onealign[i].Entry;
-                                    addedEvent.NumberOfOcc = 1;
-                                    reInBetween[indexOfCurrTask].AddedEventsInBetween.Add(addedEvent);
-                                }
-                                else
-                                {
-                                    reInBetween[indexOfCurrTask].AddedEventsInBetween[indexOfEvent].NumberOfOcc++;
-                                }
-                            }
-                            #endregion
-                        }
-                        #region FTask
-                        //if (i + 1 == onealign.Count)
-                        //{
-                        //    //i is the last match in onealign
-
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
-                        //{
-
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
-                        //{
-                        //    int indexOfPre = reInBetween.FindIndex(x => x.PreAction == onealign[i - 1].TaskMarking);
-                        //    if (indexOfPre > -1)
-                        //    {
-                        //        reInBetween[indexOfPre].NextAction = onealign[i + 1].TaskMarking;
-                        //        if (reInBetween[indexOfPre].AddedEventsInBetween.FindIndex(x => x.Event == onealign[i].Entry) > -1)
-                        //        {
-                        //        }
-                        //        else
-                        //        {
-                        //            AddedEvents oneAddedEvents = new AddedEvents();
-                        //            oneAddedEvents.Event = onealign[i].Entry;
-                        //            oneAddedEvents.NumberOfOcc = 1;
-                        //            reInBetween[indexOfPre].AddedEventsInBetween.Add(oneAddedEvents);
-                        //        }
-                                
-                        //    }
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
-                        //{
-                        //}
-                        #endregion
+                        currCon.AddedEventsInBetween.Add(addedEvent);                              
                     }
                     else if (onealign[i].MatchType == TypeOfMatch.CTaskFEntry)
                     {
-                        int indexOf = reInBetween.FindIndex(x=>x.PreAction== currTask);
-                        if (indexOf > -1)
+                        if (currCon.AddedEventsInBetween.Count > 0)
                         {
-                            reInBetween[indexOf].NextAction = onealign[i].TaskMarking;
+                            currCon.NextAction = onealign[i].TaskMarking;
+
+                            reInBetween.Add(currCon);
+                            currCon = new ConnectedPairFromModel();                            
                         }
-                        currTask = onealign[i].TaskMarking;
+                        currCon.PreAction = onealign[i].TaskMarking;                        
                         //one activity in model is missing in log, change the property of one in reCauses
                         int indexOfmiss = reCauses.FindIndex(x=>x.Task.ID==onealign[i].TaskMarking.ID);
                         if(indexOfmiss<0)
@@ -3402,25 +3217,211 @@ namespace BPMNExecutionAndComplianceCheck
                         else
                         {
                             reCauses[indexOfmiss].NumberOfMiss++;
-                        }                        
+                        }
                         
-                        #region CTask
-                        //if (i + 1 == onealign.Count)
-                        //{
-                        //    //i is the last match in onealign
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.BothCorrect)
+                    {
+                        if (currCon.AddedEventsInBetween.Count > 0)
+                        {
+                            currCon.NextAction = onealign[i].TaskMarking;
 
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
-                        //{
+                            reInBetween.Add(currCon);
+                            currCon = new ConnectedPairFromModel();                            
+                        }
+                        currCon.PreAction = onealign[i].TaskMarking;                        
+                        //one activity in model occurs in log, change the property of one in reCauses
+                        int indexOfOccu = reCauses.FindIndex(x => x.Task.ID == onealign[i].TaskMarking.ID);
+                        if (indexOfOccu < 0)
+                        {
+                            //no stored in resCauses
+                            CauseNodeAndOcc occuCause = new CauseNodeAndOcc();
+                            occuCause.Task = onealign[i].TaskMarking;
+                            occuCause.NumberOfOcc = 1;
+                            reCauses.Add(occuCause);
+                        }
+                        else
+                        {
+                            reCauses[indexOfOccu].NumberOfOcc++;
+                        }
+                    }
+                }
+            }
+            List<ConnectedPairFromModel> formattedReInBetw = new List<ConnectedPairFromModel>();
+            foreach(var connPair in reInBetween)
+            {
+                int already=formattedReInBetw.FindIndex(x => x.PreAction == connPair.PreAction && x.NextAction == connPair.NextAction);
+                if(already<0)
+                {
+                    formattedReInBetw.Add(connPair);
+                }
+                else
+                {
+                    foreach(var adde in connPair.AddedEventsInBetween)
+                    {
+                        int index = formattedReInBetw[already].AddedEventsInBetween.FindIndex(x=>(x.Event.Name==adde.Event.Name)&&( x.Event.State== adde.Event.State));
+                        if(index>-1)
+                        {
+                            formattedReInBetw[already].AddedEventsInBetween[index].NumberOfOcc++;
+                        }
+                        else
+                        {
+                            formattedReInBetw[already].AddedEventsInBetween.Add(adde);
+                        }
+                    }
+                }                
+            }
+            return formattedReInBetw;
+        }
+        /// <summary>
+        /// it turns out being failed where the intention was constructing patients' traces with only deviations, the reason is that dictionary needs finished before tranversing
+        /// </summary>
+        /// <param name="alignmentTable"></param>
+        /// <param name="reCauses"></param>
+        /// <param name="devOnlyTable"></param>
+        /// <returns></returns>
+        public List<ConnectedPairFromModel> PreparingDataForModelPerspectiveAndDevOnly(List<List<AMatch>> alignmentTable, ref List<CauseNodeAndOcc> reCauses,ref List<List<string>> devOnlyTable)
+        {            
 
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
-                        //{
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
-                        //{
-                        //}
-                        #endregion
+            List<ConnectedPairFromModel> reInBetween = new List<ConnectedPairFromModel>();
+            List<CauseNodeAndOcc> reCauDevOnly = new List<CauseNodeAndOcc>();
+
+            foreach (List<AMatch> onealign in alignmentTable)
+            {
+                List<string> outputDevlsATrace = new List<string>();
+                #region parse bothfake type
+                for (int i = 1; i < onealign.Count; i++)
+                {
+                    if (onealign[i].MatchType == TypeOfMatch.BothFake)
+                    {
+                        if (onealign[i].TaskMarking.ID == onealign[i - 1].TaskMarking.ID)
+                        {
+                            onealign[i].MatchType = TypeOfMatch.FTaskCEntry;
+                        }
+                        else if (onealign[i].Entry.ID == onealign[i - 1].Entry.ID)
+                        {
+                            onealign[i].MatchType = TypeOfMatch.CTaskFEntry;
+                        }
+                    }
+                }
+                #endregion
+
+                //initialize current TaskMarking
+                ActionNode currTask = null;
+                for (int i = 0; i < onealign.Count; i++)
+                {
+                    if (onealign[i].MatchType == TypeOfMatch.NotMatched)
+                    {
+                       
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.FTaskCEntry)
+                    {
+                        //adding one added events between currTask as preaction and other actionnode as next actionnode                        
+                        if (currTask == null)
+                        {
+                            #region currTask is null this trace starts with deviation
+                            int indexOfCurrNull = reInBetween.FindIndex(x => x.PreAction == null);
+                            if (indexOfCurrNull < 0)
+                            {
+                                ConnectedPairFromModel nullCon = new ConnectedPairFromModel();
+                                nullCon.PreAction = null;
+                                AddedEvent addedEvent = new AddedEvent();
+                                addedEvent.Event = onealign[i].Entry;
+                                addedEvent.NumberOfOcc = 1;
+                                nullCon.AddedEventsInBetween.Add(addedEvent);
+                                reInBetween.Add(nullCon);
+                            }
+                            else
+                            {
+                                //若此preaction已经存在于reInBetween中，则，找
+                                int indexOfEvent = reInBetween[indexOfCurrNull].AddedEventsInBetween.FindIndex(x => x.Event == onealign[i].Entry);
+                                if (indexOfEvent < 0)
+                                {
+                                    AddedEvent addedEvent = new AddedEvent();
+                                    addedEvent.Event = onealign[i].Entry;
+                                    addedEvent.NumberOfOcc = 1;
+                                    reInBetween[indexOfCurrNull].AddedEventsInBetween.Add(addedEvent);
+                                }
+                                else
+                                {
+                                    reInBetween[indexOfCurrNull].AddedEventsInBetween[indexOfEvent].NumberOfOcc++;
+                                }
+                            }
+                            #endregion
+                            int indDevMap= reInBetween.FindIndex(x => x.PreAction == null);                            
+                        }
+                        else
+                        {
+                            #region currTask is not null
+                            int indexOfCurrTask = reInBetween.FindIndex(x => (x.PreAction != null) && (x.PreAction.ID == currTask.ID));
+                            if (indexOfCurrTask < 0)
+                            {
+                                ConnectedPairFromModel nullCon = new ConnectedPairFromModel();
+                                nullCon.PreAction = currTask;
+                                AddedEvent addedEvent = new AddedEvent();
+                                addedEvent.Event = onealign[i].Entry;
+                                addedEvent.NumberOfOcc = 1;
+                                nullCon.AddedEventsInBetween.Add(addedEvent);
+                                reInBetween.Add(nullCon);
+                            }
+                            else
+                            {
+                                int indexOfEvent = reInBetween[indexOfCurrTask].AddedEventsInBetween.FindIndex(x => x.Event.Name == onealign[i].Entry.Name);
+                                if (indexOfEvent < 0)
+                                {
+                                    AddedEvent addedEvent = new AddedEvent();
+                                    addedEvent.Event = onealign[i].Entry;
+                                    addedEvent.NumberOfOcc = 1;
+                                    reInBetween[indexOfCurrTask].AddedEventsInBetween.Add(addedEvent);
+                                }
+                                else
+                                {
+                                    reInBetween[indexOfCurrTask].AddedEventsInBetween[indexOfEvent].NumberOfOcc++;
+                                }
+                            }
+                            #endregion                            
+                        } 
+                                             
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.CTaskFEntry)
+                    {
+                        //as long as ctask or both correct appears, undate the next action and currTask. however there is a possible bug, which is one node splits into two?
+                        int indexOf = reInBetween.FindIndex(x => x.PreAction == currTask);
+                        if (indexOf > -1)
+                        {
+                            reInBetween[indexOf].NextAction = onealign[i].TaskMarking;
+                        }
+                        currTask = onealign[i].TaskMarking;
+                        //one activity in model is missing in log, change the property of one in reCauses
+                        int indexOfmiss = reCauses.FindIndex(x => x.Task.ID == onealign[i].TaskMarking.ID);
+                        if (indexOfmiss < 0)
+                        {
+                            //no stored in resCauses
+                            CauseNodeAndOcc missCause = new CauseNodeAndOcc();
+                            missCause.Task = onealign[i].TaskMarking;
+                            missCause.NumberOfMiss = 1;
+                            reCauses.Add(missCause);
+                        }
+                        else
+                        {
+                            reCauses[indexOfmiss].NumberOfMiss++;
+                        }
+                        //Extracting deviations, so constructing another list
+                        int indInDevOnly = reCauDevOnly.FindIndex(x => x.Task.ID == onealign[i].TaskMarking.ID);
+                        if (indInDevOnly < 0)
+                        {
+                            //no stored in resCauses
+                            CauseNodeAndOcc missCause = new CauseNodeAndOcc();
+                            missCause.Task = onealign[i].TaskMarking;
+                            missCause.NumberOfMiss = 1;
+                            reCauDevOnly.Add(missCause);
+                        }
+                        else
+                        {
+                            reCauDevOnly[indInDevOnly].NumberOfMiss++;
+                        }
+                        int indInDevMap = reCauDevOnly.FindIndex(x => x.Task.ID == onealign[i].TaskMarking.ID);
+                        outputDevlsATrace.Add("M"+ (indInDevMap + 1).ToString());
                     }
                     else if (onealign[i].MatchType == TypeOfMatch.BothCorrect)
                     {
@@ -3443,29 +3444,106 @@ namespace BPMNExecutionAndComplianceCheck
                         else
                         {
                             reCauses[indexOfOccu].NumberOfOcc++;
-                        }         
-                        #region BothCorrect
-                        //if (i + 1 == onealign.Count)
-                        //{
-                        //    //i is the last match in onealign
-
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.CTaskFEntry)
-                        //{
-
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.BothCorrect)
-                        //{
-                        //}
-                        //else if (onealign[i + 1].MatchType == TypeOfMatch.FTaskCEntry)
-                        //{
-                        //}
-                        #endregion
+                        }                        
                     }
                 }
+                devOnlyTable.Add(outputDevlsATrace);
             }
 
             return reInBetween;
+        }
+
+        public void OutputOnlyDeviations(Dictionary<string, string> dicFromModel, List<KeyPairForDevL> dicFromLog, List<List<AMatch>> originalDt)
+        {
+            DataTable dtForDevOnly = new DataTable();
+            for(int i=0;i<originalDt.Max(x=>x.Count);i++)
+            {
+                dtForDevOnly.Columns.Add(i.ToString());
+            }
+            foreach (List<AMatch> onealign in originalDt)
+            {
+                List<string> outputDevlsATrace = new List<string>();
+                ConnectedPairFromModel currCon = new ConnectedPairFromModel();
+                AuditTrailEntry curEvent = new AuditTrailEntry();
+                currCon.PreAction = null;
+                for (int i = 0; i < onealign.Count; i++)
+                {  
+                    if (onealign[i].MatchType == TypeOfMatch.FTaskCEntry)
+                    {
+                        AddedEvent addedEvent = new AddedEvent();
+                        addedEvent.Event = onealign[i].Entry;
+                        addedEvent.NumberOfOcc = 1;
+                        currCon.AddedEventsInBetween.Add(addedEvent);
+
+                        curEvent = onealign[i].Entry;                        
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.CTaskFEntry)
+                    {
+                        if (currCon.AddedEventsInBetween.Count > 0)
+                        {
+                            currCon.NextAction = onealign[i].TaskMarking;
+                            
+                            KeyPairForDevL pair = new KeyPairForDevL();
+                            pair.Name = curEvent.Name;
+                            pair.PreAc = currCon.PreAction.Elment.Name;
+                            pair.NextAc = currCon.NextAction.Elment.Name;
+                            int ind = dicFromLog.FindIndex(x => x.Name == pair.Name && x.PreAc == pair.PreAc && x.NextAc == pair.NextAc);
+                            if (ind > -1)
+                            {
+                                outputDevlsATrace.Add(dicFromLog[ind].DKey);
+                            }
+
+                            currCon = new ConnectedPairFromModel();
+                        }
+                        currCon.PreAction = onealign[i].TaskMarking;
+                        outputDevlsATrace.Add(dicFromModel[onealign[i].TaskMarking.ID]);
+                    }
+                    else if (onealign[i].MatchType == TypeOfMatch.BothCorrect)
+                    {
+                        if (currCon.AddedEventsInBetween.Count > 0)
+                        {
+                            currCon.NextAction = onealign[i].TaskMarking;
+
+                            KeyPairForDevL pair = new KeyPairForDevL();
+                            pair.Name = curEvent.Name;
+                            if(currCon.PreAction==null)
+                            {
+                                pair.PreAc = "Null";
+                            }
+                            else
+                            {
+                                pair.PreAc = currCon.PreAction.Elment.Name;
+                            }
+                            if (currCon.NextAction == null)
+                            {
+                                pair.NextAc = "Null";
+                            }
+                            else
+                            {
+                                pair.NextAc = currCon.NextAction.Elment.Name;
+                            }
+                            int ind = dicFromLog.FindIndex(x => x.Name == pair.Name && x.PreAc == pair.PreAc && x.NextAc == pair.NextAc);
+                            if (ind > -1)
+                            {
+                                outputDevlsATrace.Add(dicFromLog[ind].DKey);
+                            }
+
+                            currCon = new ConnectedPairFromModel();
+                        }
+                        currCon.PreAction = onealign[i].TaskMarking;                       
+                    }
+                }
+                DataRow arow = dtForDevOnly.NewRow();
+                int m = 0;
+                foreach(var dev in outputDevlsATrace)
+                {
+                    arow[m] = dev;
+                    m++;
+                }
+                dtForDevOnly.Rows.Add(arow);
+            }
+            datatableToCSV(dtForDevOnly, System.Environment.CurrentDirectory + "\\DevDatabase.csv");
+            return;
         }
     }
 }

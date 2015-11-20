@@ -262,7 +262,7 @@ namespace BPMNExecutionAndComplianceCheck
         public bool HIDE;
         public int Layer;
     }
-    public class AddedEvents
+    public class AddedEvent
     {
         public AuditTrailEntry Event;
         public int NumberOfOcc;
@@ -280,6 +280,14 @@ namespace BPMNExecutionAndComplianceCheck
     {
         public ActionNode PreAction = new ActionNode();
         public ActionNode NextAction = new ActionNode();
-        public List<AddedEvents> AddedEventsInBetween = new List<AddedEvents>(); 
+        public List<AddedEvent> AddedEventsInBetween = new List<AddedEvent>(); 
+        //public AddedEvent AddedEvent = new AddedEvent();
+    }
+    public class KeyPairForDevL
+    {
+        public string DKey;
+        public string Name;
+        public string PreAc;
+        public string NextAc;
     }
 }

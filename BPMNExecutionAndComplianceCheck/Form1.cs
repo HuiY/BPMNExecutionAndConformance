@@ -262,12 +262,12 @@ namespace BPMNExecutionAndComplianceCheck
             else
             {
                 //showing when the input is a log
-                List<List<AMatch>> resultOfLog = new List<List<AMatch>>();
+                List<List<AMatch>> resultAllSelected = new List<List<AMatch>>();
                 Stopwatch sw = new Stopwatch();
                 long frequency = Stopwatch.Frequency;
                 int numberOfTrace = 1;
                 string numberOfNodes="";
-                List<List<AMatch>> reOneResOneTrace = new List<List<AMatch>>();
+                List<List<AMatch>> resultOneTraceSelected = new List<List<AMatch>>();
 
                 sw.Start();
                 foreach (var trace in this.listTraces)
@@ -289,17 +289,17 @@ namespace BPMNExecutionAndComplianceCheck
                         align[0].TraceID = numberOfTrace.ToString();
                     }
                     //resultOfLog.AddRange(alignmentTable);
-                    resultOfLog.Add(alignmentTable[0]);
-                    reOneResOneTrace.Add(alignmentTable[0]);
+                    resultAllSelected.Add(alignmentTable[0]);
+                    resultOneTraceSelected.Add(alignmentTable[0]);
                     numberOfTrace++;
                 }
                 sw.Stop();
                 //preparing the alignmentTable into a BPMN result
-                List<CauseNodeAndOcc> resultFromModel = new List<CauseNodeAndOcc>(); 
-                List<ConnectedPairFromModel> resultFromLog = PreparingDataForModelPerspective(reOneResOneTrace, ref resultFromModel);
+                List<CauseNodeAndOcc> devsFmModelAspect = new List<CauseNodeAndOcc>(); 
+                List<ConnectedPairFromModel> devsFmLogAspect = PreparingDataForModelPerspective(resultOneTraceSelected, ref devsFmModelAspect);
                 string miSeconds = sw.ElapsedMilliseconds.ToString();
-                #region showing detailed results
-                int max = resultOfLog.Max(x => x.Count);
+                #region showing detailed results for one trace, multiple results
+                int max = resultAllSelected.Max(x => x.Count);
                 DataTable dtForShow = new DataTable();     
                 //added trace number
                 for (int i = 0; i < max; i++)
@@ -308,7 +308,7 @@ namespace BPMNExecutionAndComplianceCheck
                 }
                 int numberOfDevTraces = 0;
                 
-                foreach (var alignment in resultOfLog)
+                foreach (var alignment in resultAllSelected)
                 {
                     bool flagDev = false;
                     DataRow rowLog = dtForShow.NewRow();
@@ -363,11 +363,10 @@ namespace BPMNExecutionAndComplianceCheck
                 this.resultDataTable = dtForShow;
                 #endregion
 
-                #region showing overall results
-                             
+                #region showing deviations from model's and log's perspectives overall                        
                 //for model  
                 DataTable dtForModel = new DataTable();               
-                for (int i = 0; i < resultFromModel.Count+1; i++)
+                for (int i = 0; i < devsFmModelAspect.Count+1; i++)
                 {
                     dtForModel.Columns.Add(i.ToString(), typeof(string));
                 }
@@ -377,11 +376,11 @@ namespace BPMNExecutionAndComplianceCheck
                 rowNumOfOcc[0] = "Number Of Occurance";
                 DataRow rowNumOfMiss = dtForModel.NewRow();
                 rowNumOfMiss[0] = "Number Of Missing";        
-                for(int i=0;i<resultFromModel.Count;i++)
+                for(int i=0;i<devsFmModelAspect.Count;i++)
                 {
-                    rowTask[i + 1] =resultFromModel[i].Task.Elment.Name;
-                    rowNumOfOcc[i + 1] = resultFromModel[i].NumberOfOcc;
-                    rowNumOfMiss[i + 1] = resultFromModel[i].NumberOfMiss;
+                    rowTask[i + 1] =devsFmModelAspect[i].Task.Elment.Name;
+                    rowNumOfOcc[i + 1] = devsFmModelAspect[i].NumberOfOcc;
+                    rowNumOfMiss[i + 1] = devsFmModelAspect[i].NumberOfMiss;
                 }
                 dtForModel.Rows.Add(rowTask);
                 dtForModel.Rows.Add(rowNumOfOcc);               
@@ -390,7 +389,7 @@ namespace BPMNExecutionAndComplianceCheck
 
                 //for logs' part
                 DataTable dtForLog = new DataTable();
-                int countOfCo = resultFromLog.Sum(x=>x.AddedEventsInBetween.Count);
+                int countOfCo = devsFmLogAspect.Sum(x=>x.AddedEventsInBetween.Count);
                 for (int i = 0; i < countOfCo + 1; i++)
                 {
                     dtForLog.Columns.Add(i.ToString(), typeof(string));
@@ -405,27 +404,27 @@ namespace BPMNExecutionAndComplianceCheck
                 rowOccu[0] = "Occurance Times";
 
                 int pos = 1;
-                for(int i=0;i<resultFromLog.Count;i++)
+                for(int i=0;i<devsFmLogAspect.Count;i++)
                 {
-                    for (int j = 0; j < resultFromLog[i].AddedEventsInBetween.Count; j++)
+                    for (int j = 0; j < devsFmLogAspect[i].AddedEventsInBetween.Count; j++)
                     {                        
-                        rowEvent[pos] = resultFromLog[i].AddedEventsInBetween[j].Event.Name;
-                        rowOccu[pos] = resultFromLog[i].AddedEventsInBetween[j].NumberOfOcc;
-                        if (resultFromLog[i].PreAction == null || resultFromLog[i].PreAction.ID==null)
+                        rowEvent[pos] = devsFmLogAspect[i].AddedEventsInBetween[j].Event.Name;
+                        rowOccu[pos] = devsFmLogAspect[i].AddedEventsInBetween[j].NumberOfOcc;
+                        if (devsFmLogAspect[i].PreAction == null || devsFmLogAspect[i].PreAction.ID==null)
                         {
                             rowPre[pos] = "Null";                            
                         }
                         else
                         {
-                            rowPre[pos] = resultFromLog[i].PreAction.Elment.Name;
+                            rowPre[pos] = devsFmLogAspect[i].PreAction.Elment.Name;
                         }
-                        if (resultFromLog[i].NextAction==null || resultFromLog[i].NextAction.ID==null)
+                        if (devsFmLogAspect[i].NextAction==null || devsFmLogAspect[i].NextAction.ID==null)
                         {
                             rowNext[pos] = "Null";                           
                         }
                         else
                         {
-                            rowNext[pos] = resultFromLog[i].NextAction.Elment.Name;
+                            rowNext[pos] = devsFmLogAspect[i].NextAction.Elment.Name;
                         }
                         pos++;                   
                     }
@@ -437,7 +436,99 @@ namespace BPMNExecutionAndComplianceCheck
                 this.dataGridViewLog.DataSource = dtForLog.AsDataView();
                 #endregion
                 string show = "Succeed ! And takes " + miSeconds + "ms. And number of nodes is" + numberOfNodes+" And number of dev traces is "+numberOfDevTraces.ToString();
-                MessageBox.Show(show);                
+                MessageBox.Show(show);
+                #region preparing for data mining
+
+                DataTable dtForDevMap = new DataTable();
+                #region preparing from model's dictionary 
+                Dictionary<string, string> dicforMolDev = new Dictionary<string, string>();
+                //create columns number of which is maximum between log and model count plus !
+                for(int i=0;i<Math.Max(devsFmModelAspect.Count, countOfCo) +1;i++)
+                {
+                    dtForDevMap.Columns.Add(i.ToString(), typeof(string));
+                }
+                DataRow rowID = dtForDevMap.NewRow();
+                rowID[0] = "Key";
+                DataRow rowTaskIDM = dtForDevMap.NewRow();
+                rowTaskIDM[0] = "ID of Activity in Model";
+                DataRow rowTaskDevM = dtForDevMap.NewRow();
+                rowTaskDevM[0] = "Activity";
+                int devPos = 0;            
+                for (int i = 0; i < devsFmModelAspect.Count; i++)
+                {
+                    if (devsFmModelAspect[i].NumberOfMiss == 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        rowID[devPos + 1] = "M" + (devPos+1).ToString();
+                        rowTaskDevM[devPos + 1] = devsFmModelAspect[i].Task.Elment.Name;
+                        rowTaskIDM[devPos + 1] = devsFmModelAspect[i].Task.ID;
+                        //in case of the same task appearing more than one time, we use id, instead of name for dictionary
+                        dicforMolDev.Add((string)rowTaskIDM[devPos + 1], (string)rowID[devPos + 1]);
+                        devPos++;
+                    }                                   
+                }
+                dtForDevMap.Rows.Add(rowID);
+                dtForDevMap.Rows.Add(rowTaskDevM);
+                dtForDevMap.Rows.Add(dtForDevMap.NewRow());
+                #endregion
+
+                #region preparing from log's dictionary
+                List<KeyPairForDevL> dicForLogDev = new List<KeyPairForDevL>();
+                DataRow rowEventID = dtForDevMap.NewRow();
+                rowEventID[0] = "Key";
+                DataRow rowEventDev = dtForDevMap.NewRow();
+                rowEventDev[0] = "Added Events";
+                DataRow rowPreDev = dtForDevMap.NewRow();
+                rowPreDev[0] = "Pre-Task";
+                DataRow rowNextDev = dtForDevMap.NewRow();
+                rowNextDev[0] = "Next-Task";               
+
+                pos = 1;
+                for (int i = 0; i < devsFmLogAspect.Count; i++)
+                {
+                    for (int j = 0; j < devsFmLogAspect[i].AddedEventsInBetween.Count; j++)
+                    {
+                        rowEventDev[pos] = devsFmLogAspect[i].AddedEventsInBetween[j].Event.Name;
+                        rowOccu[pos] = devsFmLogAspect[i].AddedEventsInBetween[j].NumberOfOcc;
+                        if (devsFmLogAspect[i].PreAction == null || devsFmLogAspect[i].PreAction.ID == null)
+                        {
+                            rowPreDev[pos] = "Null";
+                        }
+                        else
+                        {
+                            rowPreDev[pos] = devsFmLogAspect[i].PreAction.Elment.Name;
+                        }
+                        if (devsFmLogAspect[i].NextAction == null || devsFmLogAspect[i].NextAction.ID == null)
+                        {
+                            rowNextDev[pos] = "Null";
+                        }
+                        else
+                        {
+                            rowNextDev[pos] = devsFmLogAspect[i].NextAction.Elment.Name;
+                        }
+                        rowEventID[pos] = "L" + pos.ToString();
+                        KeyPairForDevL pair = new KeyPairForDevL();
+                        pair.Name= devsFmLogAspect[i].AddedEventsInBetween[j].Event.Name;
+                        pair.PreAc = (string)rowPreDev[pos];
+                        pair.NextAc = (string)rowNextDev[pos];
+                        pair.DKey= "L" + pos.ToString();
+                        dicForLogDev.Add(pair);
+                        pos++;
+                    }
+                }
+                dtForDevMap.Rows.Add(rowEventID);
+                dtForDevMap.Rows.Add(rowEventDev);
+                dtForDevMap.Rows.Add(rowPreDev);
+                dtForDevMap.Rows.Add(rowNextDev);
+                #endregion
+                datatableToCSV(dtForDevMap, System.Environment.CurrentDirectory+"\\DevMapping.csv");
+                #endregion
+
+                //given dictionary from both sides, outputing the traces files as input of data mining
+                OutputOnlyDeviations(dicforMolDev, dicForLogDev, resultOneTraceSelected);
             }
         }
 
